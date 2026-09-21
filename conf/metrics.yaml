@@ -1,0 +1,32 @@
+metrics:
+  - name: DAU
+    aliases: [日活, 日活跃用户数]
+    formula: COUNT(DISTINCT CASE WHEN f.is_active = 1 THEN f.player_id END)
+    source_table: fact_player_daily
+    time_column: date_id
+    grain: day
+  - name: Revenue
+    aliases: [流水, 收入, 总付费]
+    formula: SUM(f.amount)
+    source_table: fact_payment
+    time_column: date_id
+    grain: day
+  - name: PayerCount
+    aliases: [付费人数, 付费用户数]
+    formula: COUNT(DISTINCT f.player_id)
+    source_table: fact_payment
+    time_column: date_id
+    grain: day
+  - name: ARPU
+    aliases: [每活跃用户平均收入]
+    formula: SUM(p.amount) / NULLIF(COUNT(DISTINCT CASE WHEN a.is_active = 1 THEN a.player_id END), 0)
+    source_table: fact_payment
+    required_tables: [fact_payment, fact_player_daily]
+    time_column: date_id
+    grain: day
+  - name: LevelPassRate
+    aliases: [关卡通过率, 通关率]
+    formula: SUM(f.passed) / NULLIF(SUM(f.attempts), 0)
+    source_table: fact_level_event
+    time_column: date_id
+    grain: level
