@@ -79,13 +79,21 @@ graph_builder.add_edge("filter_metric", "add_extra_context")
 graph_builder.add_edge("add_extra_context", "generate_sql")
 graph_builder.add_edge("generate_sql", "validate_sql")
 
-# SQL 校验通过就直接执行，校验失败则先进入修正节点
+def route_after_validation(state: DataAgentState):
+    if state["error"] is None:
+        return "run_sql"
+    if state.get("correction_attempts", 0) < 2:
+        return "correct_sql"
+    return "end"
+
+
+# SQL 校验通过就直接执行；失败最多修正两次，每次修正后重新校验
 graph_builder.add_conditional_edges(
     source="validate_sql",
-    path=lambda state: "run_sql" if state["error"] is None else "correct_sql",
-    path_map={"run_sql": "run_sql", "correct_sql": "correct_sql"},
+    path=route_after_validation,
+    path_map={"run_sql": "run_sql", "correct_sql": "correct_sql", "end": END},
 )
-graph_builder.add_edge("correct_sql", "run_sql")
+graph_builder.add_edge("correct_sql", "validate_sql")
 graph_builder.add_edge("run_sql", END)
 
 # 编译后的 graph 是对外使用的 Agent 执行入口
