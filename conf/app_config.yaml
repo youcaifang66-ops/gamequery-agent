@@ -2,7 +2,7 @@ logging:
   file:
     enable: true
     level: INFO
-    path: logs
+    path: ${oc.env:LOG_PATH,logs}
     rotation: "10 MB"
     retention: "7 days"
   console:
@@ -10,31 +10,31 @@ logging:
     level: INFO
 
 db_meta:
-  host: localhost
+  host: ${oc.env:META_DB_HOST,localhost}
   port: 3306
   user: didilili
-  password: dili123
+  password: ${oc.env:MYSQL_PASSWORD,dili123}
   database: meta
 
 db_dw:
-  host: localhost
+  host: ${oc.env:DW_DB_HOST,localhost}
   port: 3306
   user: didilili
-  password: dili123
+  password: ${oc.env:MYSQL_PASSWORD,dili123}
   database: dw
 
 qdrant:
-  host: localhost
+  host: ${oc.env:QDRANT_HOST,localhost}
   port: 6333
   embedding_size: 1024
 
 embedding:
-  host: localhost
+  host: ${oc.env:EMBEDDING_HOST,localhost}
   port: 8081
   model: BAAI/bge-large-zh-v1.5
 
 es:
-  host: localhost
+  host: ${oc.env:ES_HOST,localhost}
   port: 9200
   index_name: data_agent
 

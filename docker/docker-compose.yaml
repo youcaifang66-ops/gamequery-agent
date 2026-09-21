@@ -1,4 +1,30 @@
 services:
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      LLM_API_KEY: ${LLM_API_KEY}
+      META_DB_HOST: mysql
+      DW_DB_HOST: mysql
+      MYSQL_PASSWORD: dili123
+      QDRANT_HOST: qdrant
+      EMBEDDING_HOST: embedding
+      ES_HOST: elasticsearch
+    depends_on:
+      - mysql
+      - elasticsearch
+      - qdrant
+      - embedding
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+
   mysql:
     image: mysql:8.0
     container_name: mysql
