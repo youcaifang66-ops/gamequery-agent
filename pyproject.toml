@@ -1,9 +1,9 @@
 [project]
-name = "shopkeeper-agent"
+name = "gamequery-agent"
 version = "0.1.0"
-description = "Add your description here"
+description = "A LangGraph Text-to-SQL agent for game operations analytics"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12,<3.14"
 dependencies = [
     "asyncmy>=0.2.11",
     "cryptography>=46.0.7",
@@ -27,12 +27,13 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pre-commit>=4.3.0",
+    "pytest>=8.3.0",
     "ruff>=0.11.0",
 ]
 
 [tool.ruff]
 line-length = 88
-target-version = "py314"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]

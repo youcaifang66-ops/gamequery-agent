@@ -5,7 +5,7 @@
 
 # Shopkeeper Agent Frontend
 
-匹配后端 `shopkeeper-agent` 的问数聊天前端，技术栈为 React + Vite + Tailwind CSS + pnpm。
+匹配后端 `gamequery-agent` 的游戏问数前端，技术栈为 React + Vite + Tailwind CSS + pnpm。
 
 ## 启动
 

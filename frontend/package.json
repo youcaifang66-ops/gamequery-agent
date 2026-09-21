@@ -1,6 +1,6 @@
 {
-  "name": "shopkeeper-agent-frontend",
-  "description": "电商问数智能体前端项目，提供聊天式问数界面和 SSE 流程展示。",
+  "name": "gamequery-agent-frontend",
+  "description": "游戏运营问数 Agent 前端，提供自然语言查询和 SSE 执行轨迹。",
   "private": true,
   "version": "0.1.0",
   "type": "module",

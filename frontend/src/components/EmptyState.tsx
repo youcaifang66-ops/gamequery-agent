@@ -12,7 +12,7 @@ type EmptyStateProps = {
 const highlights = [
   { label: "混合检索", icon: Search },
   { label: "SQL 闭环", icon: LineChart },
-  { label: "电商数仓", icon: ShoppingBag },
+  { label: "游戏数仓", icon: ShoppingBag },
 ];
 
 export function EmptyState({ examples, onUseExample }: EmptyStateProps) {
@@ -24,7 +24,7 @@ export function EmptyState({ examples, onUseExample }: EmptyStateProps) {
           Shopkeeper Agent
         </div>
         <h1 className="text-balance text-4xl font-semibold leading-tight text-ink sm:text-6xl">
-          电商问数
+          游戏问数
         </h1>
       </div>
 

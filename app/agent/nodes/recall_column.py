@@ -33,7 +33,7 @@ async def recall_column(state: DataAgentState, runtime: Runtime[DataAgentContext
         column_qdrant_repository = runtime.context["column_qdrant_repository"]
         embedding_client = runtime.context["embedding_client"]
 
-        # 用 LLM 把用户问法扩展成“字段语义”列表，例如“销售总额”可扩展出“销售金额”
+        # 用 LLM 扩展字段语义，例如“游戏时长”可扩展出“在线分钟数”
         prompt = PromptTemplate(
             template=load_prompt("extend_keywords_for_column_recall"),
             input_variables=["query"],

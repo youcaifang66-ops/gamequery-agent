@@ -20,10 +20,10 @@ import { cn, summarizeResult } from "./lib/format";
 import type { AgentEvent, ChatMessage, StepState } from "./types/agent";
 
 const examples = [
-  "统计 2025 年第一季度各大区的 GMV，并按 GMV 从高到低排序",
-  "统计 2025 年 3 月各商品品类的销量和销售额",
-  "查询华东地区 2025 年第一季度销售额最高的前 5 个商品",
-  "按会员等级统计 2025 年第一季度的订单数和销售额",
+  "统计 2026 年 9 月 18 日各游戏的 DAU",
+  "统计 2026 年 9 月各平台的活跃玩家数和在线时长",
+  "查询 2026 年 9 月各游戏的总收入和付费人数",
+  "统计 LEVEL_05 与 LEVEL_07 的关卡通过率",
 ];
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "Vite /api proxy";
@@ -172,8 +172,8 @@ export default function App() {
                 <BarChart3 className="h-5 w-5" aria-hidden="true" />
               </div>
               <div>
-                <div className="text-base font-semibold tracking-[0.02em]">电商问数</div>
-                <div className="text-xs text-ink/50">shopkeeper-agent</div>
+                <div className="text-base font-semibold tracking-[0.02em]">GameQuery</div>
+                <div className="text-xs text-ink/50">游戏数据分析 Agent</div>
               </div>
             </div>
           </div>

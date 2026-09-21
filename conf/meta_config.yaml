@@ -1,176 +1,87 @@
 tables:
-  - name: dim_region
+  - name: dim_player
     role: dim
-    description: 地区维度表，用于描述订单发生的地理区域信息。
+    description: 玩家维度，记录注册来源、地区与游戏平台。
     columns:
-      - name: region_id
-        role: primary_key
-        description: 地区唯一标识。
-        alias: [地区ID, 区域ID]
-        sync: false
+      - {name: player_id, role: primary_key, description: 玩家唯一标识。, alias: [玩家ID, 用户ID], sync: false}
+      - {name: register_date, role: dimension, description: 玩家注册日期。, alias: [注册日期, 注册时间], sync: true}
+      - {name: region, role: dimension, description: 玩家所在地区。, alias: [地区, 区域], sync: true}
+      - {name: platform, role: dimension, description: 登录游戏平台。, alias: [平台, 设备平台], sync: true}
+      - {name: acquisition_channel, role: dimension, description: 玩家获取渠道。, alias: [渠道, 获客渠道], sync: true}
 
-      - name: province
-        role: dimension
-        description: 订单所属的省份名称。
-        alias: [省份, 省, 所在省份]
-        sync: true
-
-      - name: region_name
-        role: dimension
-        description: 订单所属的大区名称，如华东、华南等。
-        alias: [地区, 区域, 大区]
-        sync: true
-
-      - name: country
-        role: dimension
-        description: 地区所属国家名称。
-        alias: [国家, 国家名称]
-        sync: true
-
-  - name: dim_customer
+  - name: dim_game
     role: dim
-    description: 客户维度表，描述下单客户的基本属性。
+    description: 游戏维度，记录游戏名称与品类。
     columns:
-      - name: customer_id
-        role: primary_key
-        description: 客户唯一标识。
-        alias: [客户ID, 用户ID]
-        sync: false
-
-      - name: customer_name
-        role: dimension
-        description: 客户名称。
-        alias: [客户名称, 用户名称]
-        sync: true
-
-      - name: gender
-        role: dimension
-        description: 客户性别。
-        alias: [性别]
-        sync: true
-
-      - name: member_level
-        role: dimension
-        description: 客户会员等级。
-        alias: [会员等级, 用户等级]
-        sync: true
-
-  - name: dim_product
-    role: dim
-    description: 商品维度表，描述商品的基本属性信息。
-    columns:
-      - name: product_id
-        role: primary_key
-        description: 商品唯一标识。
-        alias: [商品ID, 产品ID]
-        sync: false
-
-      - name: product_name
-        role: dimension
-        description: 商品名称。
-        alias: [商品名称, 产品名称]
-        sync: true
-
-      - name: category
-        role: dimension
-        description: 商品所属品类。
-        alias: [商品类别, 品类, 分类]
-        sync: true
-
-      - name: brand
-        role: dimension
-        description: 商品品牌名称。
-        alias: [品牌, 品牌名称]
-        sync: true
+      - {name: game_id, role: primary_key, description: 游戏唯一标识。, alias: [游戏ID], sync: false}
+      - {name: game_name, role: dimension, description: 游戏名称。, alias: [游戏, 游戏名称], sync: true}
+      - {name: genre, role: dimension, description: 游戏品类。, alias: [品类, 游戏类型], sync: true}
 
   - name: dim_date
     role: dim
-    description: 时间维度表，用于多时间粒度分析。
+    description: 日期维度，用于日、月和季度分析。
     columns:
-      - name: date_id
-        role: primary_key
-        description: 日期唯一标识，格式 yyyyMMdd。
-        alias: [日期ID, 日期]
-        sync: false
+      - {name: date_id, role: primary_key, description: 日期键，格式yyyyMMdd。, alias: [日期ID, 日期], sync: false}
+      - {name: year, role: dimension, description: 年份。, alias: [年, 年份], sync: false}
+      - {name: quarter, role: dimension, description: 季度。, alias: [季度], sync: true}
+      - {name: month, role: dimension, description: 月份。, alias: [月, 月份], sync: false}
+      - {name: day, role: dimension, description: 日。, alias: [日, 天], sync: false}
 
-      - name: year
-        role: dimension
-        description: 年份。
-        alias: [年, 年份]
-        sync: false
-
-      - name: quarter
-        role: dimension
-        description: 季度。
-        alias: [季度]
-        sync: true
-
-      - name: month
-        role: dimension
-        description: 月份。
-        alias: [月, 月份]
-        sync: false
-
-      - name: day
-        role: dimension
-        description: 日。
-        alias: [日, 天]
-        sync: false
-
-  - name: fact_order
+  - name: fact_player_daily
     role: fact
-    description: 订单事实表，记录订单数量和金额等核心指标。
+    description: 玩家日活事实表，记录登录、在线时长和最高等级。
     columns:
-      - name: order_id
-        role: primary_key
-        description: 订单唯一标识。
-        alias: [订单ID]
-        sync: false
+      - {name: event_id, role: primary_key, description: 日活事件唯一标识。, alias: [事件ID], sync: false}
+      - {name: player_id, role: foreign_key, description: 关联玩家维度。, alias: [玩家ID, 用户ID], sync: false}
+      - {name: game_id, role: foreign_key, description: 关联游戏维度。, alias: [游戏ID], sync: false}
+      - {name: date_id, role: foreign_key, description: 关联日期维度。, alias: [活跃日期, 日期], sync: false}
+      - {name: login_count, role: measure, description: 当日登录次数。, alias: [登录次数], sync: false}
+      - {name: online_minutes, role: measure, description: 当日在线分钟数。, alias: [在线时长, 游戏时长], sync: false}
+      - {name: level_reached, role: measure, description: 当日达到的最高等级。, alias: [等级, 玩家等级], sync: false}
+      - {name: is_active, role: measure, description: 当日是否活跃，1表示活跃。, alias: [活跃, 是否活跃], sync: false}
 
-      - name: customer_id
-        role: foreign_key
-        description: 关联客户维度的外键。
-        alias: [客户ID, 用户ID]
-        sync: false
+  - name: fact_payment
+    role: fact
+    description: 游戏支付事实表，记录玩家每笔付费。
+    columns:
+      - {name: payment_id, role: primary_key, description: 支付唯一标识。, alias: [支付ID, 订单ID], sync: false}
+      - {name: player_id, role: foreign_key, description: 关联玩家维度。, alias: [付费玩家, 玩家ID], sync: false}
+      - {name: game_id, role: foreign_key, description: 关联游戏维度。, alias: [游戏ID], sync: false}
+      - {name: date_id, role: foreign_key, description: 关联日期维度。, alias: [付费日期, 日期], sync: false}
+      - {name: amount, role: measure, description: 支付金额，单位为元。, alias: [流水, 收入, 付费金额], sync: false}
+      - {name: currency, role: dimension, description: 支付币种。, alias: [币种], sync: true}
 
-      - name: product_id
-        role: foreign_key
-        description: 关联商品维度的外键。
-        alias: [商品ID, 产品ID]
-        sync: false
-
-      - name: date_id
-        role: foreign_key
-        description: 关联时间维度的外键。
-        alias: [日期, 下单日期]
-        sync: false
-
-      - name: region_id
-        role: foreign_key
-        description: 关联地区维度的外键。
-        alias: [地区ID, 区域ID]
-        sync: false
-
-      - name: order_quantity
-        role: measure
-        description: 订单中商品的购买数量。
-        alias: [销量, 购买数量, 件数]
-        sync: false
-
-      - name: order_amount
-        role: measure
-        description: 订单金额。
-        alias: [销售额, 订单金额, 收入]
-        sync: false
+  - name: fact_level_event
+    role: fact
+    description: 关卡挑战事实表，记录挑战次数、是否通关与耗时。
+    columns:
+      - {name: event_id, role: primary_key, description: 关卡事件唯一标识。, alias: [关卡事件ID], sync: false}
+      - {name: player_id, role: foreign_key, description: 关联玩家维度。, alias: [玩家ID], sync: false}
+      - {name: game_id, role: foreign_key, description: 关联游戏维度。, alias: [游戏ID], sync: false}
+      - {name: date_id, role: foreign_key, description: 关联日期维度。, alias: [挑战日期], sync: false}
+      - {name: level_id, role: dimension, description: 关卡标识。, alias: [关卡, 关卡ID], sync: true}
+      - {name: attempts, role: measure, description: 关卡挑战次数。, alias: [挑战次数], sync: false}
+      - {name: passed, role: measure, description: 是否通关，1表示通关。, alias: [通关, 是否通过], sync: false}
+      - {name: duration_seconds, role: measure, description: 本次挑战耗时秒数。, alias: [通关耗时, 挑战时长], sync: false}
 
 metrics:
-  - name: GMV
-    description: 全称Gross Merchandise Value，表示所有订单的成交金额总和。
-    relevant_columns:
-      - fact_order.order_amount
-    alias: [成交总额, 订单总额]
-  - name: AOV
-    description: 全称Average Order Value，表示所有订单的成交金额平均值。
-    relevant_columns:
-      - fact_order.order_quantity
-    alias: [平均单价, 平均订单金额]
+  - name: DAU
+    description: 每日活跃玩家去重数。
+    relevant_columns: [fact_player_daily.player_id, fact_player_daily.is_active]
+    alias: [日活, 日活跃用户数]
+  - name: Revenue
+    description: 游戏支付金额总和。
+    relevant_columns: [fact_payment.amount]
+    alias: [流水, 收入, 总付费]
+  - name: PayerCount
+    description: 发生支付的去重玩家数。
+    relevant_columns: [fact_payment.player_id]
+    alias: [付费人数, 付费用户数]
+  - name: ARPU
+    description: 总收入除以活跃玩家数。
+    relevant_columns: [fact_payment.amount, fact_player_daily.player_id, fact_player_daily.is_active]
+    alias: [每活跃用户平均收入]
+  - name: LevelPassRate
+    description: 指定关卡通关事件数除以挑战事件数。
+    relevant_columns: [fact_level_event.passed, fact_level_event.attempts]
+    alias: [关卡通过率, 通关率]
