@@ -6,6 +6,7 @@
 并统一包装成 SSE 文本返回给路由层。
 """
 
+import asyncio
 import json
 
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
@@ -58,12 +59,16 @@ class QueryService:
         )
         try:
             # stream_mode="custom" 对应节点内部 writer(...) 写出的进度消息
-            async for chunk in graph.astream(
-                input=state, context=context, stream_mode="custom"
-            ):
-                # SSE 要求每条消息以 data: 开头，并以两个换行符结束
-                # ensure_ascii=False 保留中文进度文案，default=str 兜底处理日期等非 JSON 类型
-                yield f"data: {json.dumps(chunk, ensure_ascii=False, default=str)}\n\n"
+            async with asyncio.timeout(60):
+                async for chunk in graph.astream(
+                    input=state, context=context, stream_mode="custom"
+                ):
+                    # SSE 要求每条消息以 data: 开头，并以两个换行符结束
+                    # ensure_ascii=False 保留中文进度文案，default=str 兜底处理日期等非 JSON 类型
+                    yield f"data: {json.dumps(chunk, ensure_ascii=False, default=str)}\n\n"
+        except TimeoutError:
+            error = {"type": "error", "code": "QUERY_TIMEOUT", "message": "查询超过60秒"}
+            yield f"data: {json.dumps(error, ensure_ascii=False)}\n\n"
         except Exception as e:
             # 流式接口已经开始返回后不能再改 HTTP 状态码，因此把异常也包装成一条 SSE 消息
             error = {"type": "error", "message": str(e)}

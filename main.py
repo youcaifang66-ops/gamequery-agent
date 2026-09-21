@@ -15,7 +15,7 @@ from app.api.routers.query_router import query_router
 from app.core.context import request_id_ctx_var
 
 # lifespan 交给 FastAPI 管理，用于在服务启动和关闭时统一初始化与释放外部客户端
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(title="GameQuery Agent", version="1.0.0", lifespan=lifespan)
 
 # 把查询路由注册进应用；没有挂载时，/docs 和真实 HTTP 请求都访问不到该接口
 app.include_router(query_router)
@@ -27,5 +27,11 @@ async def add_request_id(request: Request, call_next):
     request_id = uuid.uuid4()
     request_id_ctx_var.set(request_id)
     response = await call_next(request)
+    response.headers["X-Request-ID"] = str(request_id)
     # 请求被处理之后
     return response
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok", "service": "gamequery-agent", "version": "1.0.0"}
