@@ -4,7 +4,6 @@ import pytest
 
 from app.security.sql_guard import SQLGuard, SQLGuardError
 
-
 GUARD = SQLGuard.from_meta_config(Path(__file__).resolve().parents[1] / "conf" / "meta_config.yaml")
 
 

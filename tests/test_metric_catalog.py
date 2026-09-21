@@ -2,7 +2,6 @@ from pathlib import Path
 
 from app.semantic.metric_catalog import MetricCatalog
 
-
 CATALOG = MetricCatalog.load(Path(__file__).resolve().parents[1] / "conf" / "metrics.yaml")
 
 

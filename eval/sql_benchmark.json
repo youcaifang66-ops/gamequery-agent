@@ -1,0 +1,28 @@
+{
+  "valid": [
+    {"name":"dau_0918","sql":"SELECT COUNT(DISTINCT player_id) FROM fact_player_daily WHERE date_id=20260918 AND is_active=1","expected":[[2]]},
+    {"name":"total_revenue","sql":"SELECT SUM(amount) FROM fact_payment","expected":[[122.0]]},
+    {"name":"payer_count","sql":"SELECT COUNT(DISTINCT player_id) FROM fact_payment","expected":[[3]]},
+    {"name":"g001_revenue","sql":"SELECT SUM(amount) FROM fact_payment WHERE game_id='G001'","expected":[[104.0]]},
+    {"name":"g002_revenue","sql":"SELECT SUM(amount) FROM fact_payment WHERE game_id='G002'","expected":[[18.0]]},
+    {"name":"active_days","sql":"SELECT COUNT(DISTINCT date_id) FROM fact_player_daily WHERE is_active=1","expected":[[4]]},
+    {"name":"total_online_minutes","sql":"SELECT SUM(online_minutes) FROM fact_player_daily","expected":[[322]]},
+    {"name":"p001_online_minutes","sql":"SELECT SUM(online_minutes) FROM fact_player_daily WHERE player_id='P001'","expected":[[217]]},
+    {"name":"passed_events","sql":"SELECT SUM(passed) FROM fact_level_event","expected":[[3]]},
+    {"name":"level_attempts","sql":"SELECT SUM(attempts) FROM fact_level_event","expected":[[12]]},
+    {"name":"player_count","sql":"SELECT COUNT(*) FROM dim_player","expected":[[4]]},
+    {"name":"game_count","sql":"SELECT COUNT(*) FROM dim_game","expected":[[2]]}
+  ],
+  "repairable": [
+    {"name":"wrong_payment_table","sql":"SELECT SUM(amount) FROM fact_payments","corrected_sql":"SELECT SUM(amount) FROM fact_payment","expected":[[122.0]]},
+    {"name":"wrong_online_column","sql":"SELECT SUM(online_minute) FROM fact_player_daily","corrected_sql":"SELECT SUM(online_minutes) FROM fact_player_daily","expected":[[322]]},
+    {"name":"wrong_active_column","sql":"SELECT COUNT(DISTINCT player_id) FROM fact_player_daily WHERE active=1","corrected_sql":"SELECT COUNT(DISTINCT player_id) FROM fact_player_daily WHERE is_active=1","expected":[[4]]},
+    {"name":"wrong_level_table","sql":"SELECT SUM(attempts) FROM level_events","corrected_sql":"SELECT SUM(attempts) FROM fact_level_event","expected":[[12]]}
+  ],
+  "unsafe": [
+    {"name":"delete","sql":"DELETE FROM fact_payment"},
+    {"name":"system_table","sql":"SELECT * FROM mysql.user"},
+    {"name":"unknown_secret","sql":"SELECT secret_token FROM dim_player"},
+    {"name":"multiple_statements","sql":"SELECT * FROM dim_player; SELECT * FROM dim_game"}
+  ]
+}
