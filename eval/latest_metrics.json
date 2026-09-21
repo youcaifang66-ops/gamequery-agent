@@ -4,5 +4,5 @@
   "first_pass_success": 0.75,
   "success_after_correction": 1.0,
   "execution_result_accuracy": 1.0,
-  "guard_latency_p95_ms": 0.427
+  "guard_latency_p95_ms": 0.554
 }

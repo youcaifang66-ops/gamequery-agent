@@ -1,6 +1,5 @@
 import json
 
-
 ALLOWED_EVENT_TYPES = {"progress", "sql", "result", "error", "done"}
 
 
