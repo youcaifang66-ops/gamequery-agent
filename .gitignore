@@ -44,6 +44,7 @@ speed-measure-plugin*.json
 .history/*
 
 # Misc (build / logs)
+logs/
 /.sass-cache
 /connect.lock
 /coverage

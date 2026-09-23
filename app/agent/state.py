@@ -60,6 +60,15 @@ class DBInfoState(TypedDict):
     version: str
 
 
+class SQLPolicyState(TypedDict):
+    """SQLGuard 对最终候选做出的可序列化策略决策。"""
+
+    tables: list[str]
+    max_rows: int
+    limit_action: str
+    timeout_ms: int
+
+
 class DataAgentState(TypedDict):
     """一次问数链路中的核心状态"""
 
@@ -75,6 +84,10 @@ class DataAgentState(TypedDict):
     db_info: DBInfoState  # 数据库方言和版本信息
 
     sql: str  # 生成或校正后的SQL
+    validated_sql: str | None  # Guard + EXPLAIN 通过的唯一可执行 SQL
+    sql_policy: SQLPolicyState | None
 
-    error: str  # 校验SQL时出现的错误信息
+    error: str | None  # 可安全提供给纠错模型或客户端的错误信息
+    error_code: str | None
+    error_correctable: bool
     correction_attempts: int  # 已执行的 SQL 修正次数，防止无限循环
