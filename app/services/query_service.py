@@ -21,6 +21,10 @@ from app.repositories.qdrant.column_qdrant_repository import ColumnQdrantReposit
 from app.repositories.qdrant.metric_qdrant_repository import MetricQdrantRepository
 from app.security.sql_guard import SQLGuard
 
+SAFE_RUNTIME_ERRORS = {
+    "RETRIEVAL_UNAVAILABLE": "检索服务暂时不可用，请稍后重试。",
+}
+
 
 class QueryService:
     """执行一次问数工作流，并将客户端事件与审计事件保持同序。"""
@@ -193,12 +197,17 @@ class QueryService:
                 )
                 terminal_sent = True
                 yield message
-        except Exception:
+        except Exception as error:
             if not terminal_sent:
+                code = getattr(error, "code", "INTERNAL_ERROR")
+                if code not in SAFE_RUNTIME_ERRORS:
+                    code = "INTERNAL_ERROR"
                 last_sequence, message = await self._failed_event(
                     request_id,
-                    code="INTERNAL_ERROR",
-                    message="查询失败，请稍后重试。",
+                    code=code,
+                    message=SAFE_RUNTIME_ERRORS.get(
+                        code, "查询失败，请稍后重试。"
+                    ),
                     last_sequence=last_sequence,
                 )
                 terminal_sent = True

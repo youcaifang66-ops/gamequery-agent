@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from app.observability.trace_store import AsyncSQLiteTraceStore
+from app.retrieval.online import RetrievalUnavailableError
 from app.security.sql_guard import SQLGuard
 from app.services import query_service as query_service_module
 from app.services.query_service import QueryService
@@ -232,3 +233,29 @@ def test_validation_exhaustion_returns_error_without_done(monkeypatch, tmp_path)
     assert [event["type"] for event in messages] == ["progress", "error"]
     assert messages[-1]["code"] == "CORRECTION_EXHAUSTED"
     assert replay["error_code"] == "CORRECTION_EXHAUSTED"
+
+
+def test_retrieval_unavailable_uses_stable_public_code(monkeypatch, tmp_path):
+    class MissingIndexGraph:
+        async def astream(self, **kwargs):
+            raise RetrievalUnavailableError()
+            yield
+
+    async def scenario():
+        monkeypatch.setattr(query_service_module, "graph", MissingIndexGraph())
+        store = AsyncSQLiteTraceStore(tmp_path / "retrieval-unavailable.sqlite3")
+        await store.open()
+        messages = [
+            parse_sse(message)
+            async for message in make_service(store).query(
+                "查询收入", request_id="request-retrieval"
+            )
+        ]
+        replay = await store.replay("request-retrieval")
+        await store.close()
+        return messages, replay
+
+    messages, replay = asyncio.run(scenario())
+    assert [event["type"] for event in messages] == ["error"]
+    assert messages[0]["code"] == "RETRIEVAL_UNAVAILABLE"
+    assert replay["error_code"] == "RETRIEVAL_UNAVAILABLE"

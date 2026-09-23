@@ -8,7 +8,6 @@
 以及指标入库和指标向量索引构建逻辑
 """
 
-import uuid
 from dataclasses import asdict
 from pathlib import Path
 
@@ -26,6 +25,7 @@ from app.repositories.es.value_es_repository import ValueESRepository
 from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
 from app.repositories.mysql.meta.meta_mysql_repository import MetaMySQLRepository
 from app.repositories.qdrant.column_qdrant_repository import ColumnQdrantRepository
+from app.repositories.qdrant.hybrid_repository import normalize_term
 from app.repositories.qdrant.metric_qdrant_repository import MetricQdrantRepository
 
 
@@ -99,41 +99,36 @@ class MetaKnowledgeService:
         return column_infos
 
     async def _save_column_info_to_qdrant(self, column_infos: list[ColumnInfo]):
-        """把字段元数据继续推进成可语义检索的 Qdrant 向量点"""
+        """每个字段构建一个包含 dense 与 BM25 输入的稳定 v2 point。"""
         await self.column_qdrant_repository.ensure_collection()
-
-        points: list[dict] = []
+        payloads: list[dict] = []
         for column_info in column_infos:
-            # 一个字段不会只生成一个向量点，而是把名字 描述 别名都拆开建立语义入口
-            points.append(
-                {
-                    "id": uuid.uuid4(),
-                    "embedding_text": column_info.name,
-                    "payload": asdict(column_info),
-                }
-            )
-
-            points.append(
-                {
-                    "id": uuid.uuid4(),
-                    "embedding_text": column_info.description,
-                    "payload": asdict(column_info),
-                }
-            )
-
-            for alia in column_info.alias:
-                points.append(
-                    {
-                        "id": uuid.uuid4(),
-                        "embedding_text": alia,
-                        "payload": asdict(column_info),
-                    }
+            retrieval_text = " ".join(
+                filter(
+                    None,
+                    [
+                        column_info.id,
+                        column_info.name,
+                        column_info.description,
+                        column_info.table_id,
+                        *column_info.alias,
+                    ],
                 )
-
-        # 先把待向量化文本抽出来，再分批调用 Embedding 服务
-        # 这样更容易控制单次请求大小
+            )
+            payloads.append(
+                {
+                    **asdict(column_info),
+                    "entity_type": "column",
+                    "entity_id": column_info.id,
+                    "retrieval_text": retrieval_text,
+                    "normalized_name": normalize_term(column_info.name),
+                    "normalized_aliases": [
+                        normalize_term(alias) for alias in column_info.alias
+                    ],
+                }
+            )
         embeddings: list[list[float]] = []
-        embedding_texts = [point["embedding_text"] for point in points]
+        embedding_texts = [payload["retrieval_text"] for payload in payloads]
         embedding_batch_size = 20
         for i in range(0, len(embedding_texts), embedding_batch_size):
             batch_embedding_texts = embedding_texts[i : i + embedding_batch_size]
@@ -142,10 +137,7 @@ class MetaKnowledgeService:
             )
             embeddings.extend(batch_embeddings)
 
-        ids = [point["id"] for point in points]
-        payloads = [point["payload"] for point in points]
-
-        await self.column_qdrant_repository.upsert(ids, embeddings, payloads)
+        await self.column_qdrant_repository.upsert_entities(payloads, embeddings)
 
     async def _save_value_info_to_es(
         self, meta_config: MetaConfig, column_infos: list[ColumnInfo]
@@ -211,41 +203,36 @@ class MetaKnowledgeService:
         return metric_infos
 
     async def _save_metrics_to_qdrant(self, metric_infos: list[MetricInfo]):
-        """把指标元数据继续推进成可语义检索的 Qdrant 向量点"""
+        """每个指标构建一个包含 dense 与 BM25 输入的稳定 v2 point。"""
         await self.metric_qdrant_repository.ensure_collection()
-
-        points: list[dict] = []
+        payloads: list[dict] = []
         for metric_info in metric_infos:
-            # 和字段一样，一个指标也会拆成名字 描述 别名这几类语义入口
-            points.append(
-                {
-                    "id": uuid.uuid4(),
-                    "embedding_text": metric_info.name,
-                    "payload": asdict(metric_info),
-                }
-            )
-
-            points.append(
-                {
-                    "id": uuid.uuid4(),
-                    "embedding_text": metric_info.description,
-                    "payload": asdict(metric_info),
-                }
-            )
-
-            for alia in metric_info.alias:
-                points.append(
-                    {
-                        "id": uuid.uuid4(),
-                        "embedding_text": alia,
-                        "payload": asdict(metric_info),
-                    }
+            retrieval_text = " ".join(
+                filter(
+                    None,
+                    [
+                        metric_info.id,
+                        metric_info.name,
+                        metric_info.description,
+                        *metric_info.alias,
+                        *metric_info.relevant_columns,
+                    ],
                 )
-
-        # 先把待向量化文本抽出来，再分批调用 Embedding 服务
-        # 返回的 embeddings 要继续和前面的 id payload 按顺序对齐
+            )
+            payloads.append(
+                {
+                    **asdict(metric_info),
+                    "entity_type": "metric",
+                    "entity_id": metric_info.id,
+                    "retrieval_text": retrieval_text,
+                    "normalized_name": normalize_term(metric_info.name),
+                    "normalized_aliases": [
+                        normalize_term(alias) for alias in metric_info.alias
+                    ],
+                }
+            )
         embeddings: list[list[float]] = []
-        embedding_texts = [point["embedding_text"] for point in points]
+        embedding_texts = [payload["retrieval_text"] for payload in payloads]
         embedding_batch_size = 20
         for i in range(0, len(embedding_texts), embedding_batch_size):
             batch_embedding_texts = embedding_texts[i : i + embedding_batch_size]
@@ -254,10 +241,7 @@ class MetaKnowledgeService:
             )
             embeddings.extend(batch_embeddings)
 
-        ids = [point["id"] for point in points]
-        payloads = [point["payload"] for point in points]
-
-        await self.metric_qdrant_repository.upsert(ids, embeddings, payloads)
+        await self.metric_qdrant_repository.upsert_entities(payloads, embeddings)
 
     async def build(self, config_path: Path):
         """读取配置并依次构建 Meta MySQL Qdrant 和 ES 中的元数据索引"""

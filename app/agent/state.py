@@ -69,6 +69,15 @@ class SQLPolicyState(TypedDict):
     timeout_ms: int
 
 
+class RetrievalEvidenceState(TypedDict):
+    """单个候选的可复算 RRF 证据。"""
+
+    entity_type: str
+    entity_id: str
+    score: float
+    evidence: list[dict]
+
+
 class DataAgentState(TypedDict):
     """一次问数链路中的核心状态"""
 
@@ -77,6 +86,8 @@ class DataAgentState(TypedDict):
     retrieved_column_infos: list[ColumnInfo]  # 检索到的字段信息
     retrieved_metric_infos: list[MetricInfo]  # 检索到的指标信息
     retrieved_value_infos: list[ValueInfo]  # 检索到的取值信息
+    column_retrieval_evidence: list[RetrievalEvidenceState]
+    metric_retrieval_evidence: list[RetrievalEvidenceState]
 
     table_infos: list[TableInfoState]  # 合并和补齐后的表结构上下文
     metric_infos: list[MetricInfoState]  # 合并后的指标上下文
