@@ -1,8 +1,14 @@
 {
+  "mode": "static_fixture",
+  "dataset_version": "1.0",
+  "dataset_sha256": "b2c51f8875652b2eda077aa5aa24e1392843d2f56bf5fd8314f82192229ac58b",
+  "generated_at": "2026-09-23T08:50:14.431411+00:00",
   "dataset_size": 20,
   "guard_accuracy": 1.0,
-  "first_pass_success": 0.75,
-  "success_after_correction": 1.0,
-  "execution_result_accuracy": 1.0,
-  "guard_latency_p95_ms": 0.424
+  "first_pass_fixture_rate": 0.75,
+  "preset_repair_execution_accuracy": 1.0,
+  "fixture_execution_accuracy": 1.0,
+  "agent_correction_accuracy": null,
+  "agent_correction_status": "not_run",
+  "guard_latency_p95_ms": 1.724
 }

@@ -1,8 +1,10 @@
+import hashlib
 import json
 import math
 import sqlite3
 import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,14 +39,17 @@ def rows(connection, sql):
 
 
 def evaluate():
-    workload = json.loads((ROOT / "eval" / "sql_benchmark.json").read_text(encoding="utf-8"))
+    dataset_path = ROOT / "eval" / "sql_benchmark.json"
+    dataset_bytes = dataset_path.read_bytes()
+    workload = json.loads(dataset_bytes.decode("utf-8"))
     guard = SQLGuard.from_meta_config(ROOT / "conf" / "meta_config.yaml")
     connection = database()
     valid = workload["valid"]
     repairable = workload["repairable"]
     unsafe = workload["unsafe"]
     guard_correct = 0
-    result_correct = 0
+    valid_result_correct = 0
+    preset_repair_correct = 0
     latencies = []
 
     guard.validate(valid[0]["sql"])
@@ -55,14 +60,14 @@ def evaluate():
             guarded = guard.validate(case["sql"])
             latencies.append((time.perf_counter() - started) * 1000)
         guard_correct += 1
-        result_correct += rows(connection, guarded.sql) == case["expected"]
+        valid_result_correct += rows(connection, guarded.sql) == case["expected"]
     for case in repairable:
         try:
             guard.validate(case["sql"])
         except SQLGuardError:
             guard_correct += 1
         guarded = guard.validate(case["corrected_sql"])
-        result_correct += rows(connection, guarded.sql) == case["expected"]
+        preset_repair_correct += rows(connection, guarded.sql) == case["expected"]
     for case in unsafe:
         try:
             guard.validate(case["sql"])
@@ -72,11 +77,21 @@ def evaluate():
     executable = len(valid) + len(repairable)
     total = executable + len(unsafe)
     result = {
+        "mode": "static_fixture",
+        "dataset_version": "1.0",
+        "dataset_sha256": hashlib.sha256(dataset_bytes).hexdigest(),
+        "generated_at": datetime.now(timezone.utc).isoformat(),
         "dataset_size": total,
         "guard_accuracy": round(guard_correct / total, 4),
-        "first_pass_success": round(len(valid) / executable, 4),
-        "success_after_correction": round(result_correct / executable, 4),
-        "execution_result_accuracy": round(result_correct / executable, 4),
+        "first_pass_fixture_rate": round(len(valid) / executable, 4),
+        "preset_repair_execution_accuracy": round(
+            preset_repair_correct / len(repairable), 4
+        ),
+        "fixture_execution_accuracy": round(
+            (valid_result_correct + preset_repair_correct) / executable, 4
+        ),
+        "agent_correction_accuracy": None,
+        "agent_correction_status": "not_run",
         "guard_latency_p95_ms": round(
             sorted(latencies)[math.ceil(len(latencies) * 0.95) - 1], 3
         ),
@@ -84,6 +99,7 @@ def evaluate():
     (ROOT / "eval" / "latest_metrics.json").write_text(
         json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
+    connection.close()
     return result
 
 
