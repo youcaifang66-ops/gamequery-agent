@@ -1,0 +1,40 @@
+{
+  "version": "1.0",
+  "cases": [
+    {"id":"c01","query":"按地区看玩家","category":"alias","entity_type":"column","expected_ids":["dim_player.region"],"fixture_rankings":{"dense":["dim_player.region"],"lexical":["dim_player.platform","dim_player.region"],"alias":["dim_player.region"]}},
+    {"id":"c02","query":"设备平台分布","category":"alias","entity_type":"column","expected_ids":["dim_player.platform"],"fixture_rankings":{"dense":["dim_player.platform"],"lexical":["dim_player.platform"],"alias":["dim_player.platform"]}},
+    {"id":"c03","query":"获客渠道有哪些","category":"alias","entity_type":"column","expected_ids":["dim_player.acquisition_channel"],"fixture_rankings":{"lexical":["dim_player.acquisition_channel"],"alias":["dim_player.acquisition_channel"]}},
+    {"id":"c04","query":"游戏名称字段","category":"name","entity_type":"column","expected_ids":["dim_game.game_name"],"fixture_rankings":{"dense":["dim_game.game_name"],"exact":["dim_game.game_name"],"lexical":["dim_game.game_name"]}},
+    {"id":"c05","query":"游戏品类","category":"alias","entity_type":"column","expected_ids":["dim_game.genre"],"fixture_rankings":{"dense":["dim_game.genre"],"alias":["dim_game.genre"]}},
+    {"id":"c06","query":"季度维度","category":"semantic","entity_type":"column","expected_ids":["dim_date.quarter"],"fixture_rankings":{"dense":["dim_date.month","dim_date.quarter"],"lexical":["dim_date.quarter"]}},
+    {"id":"c07","query":"玩家游戏时长","category":"alias","entity_type":"column","expected_ids":["fact_player_daily.online_minutes"],"fixture_rankings":{"dense":["fact_player_daily.online_minutes"],"alias":["fact_player_daily.online_minutes"],"llm_expand":["fact_player_daily.online_minutes"]}},
+    {"id":"c08","query":"玩家达到的最高等级","category":"semantic","entity_type":"column","expected_ids":["fact_player_daily.level_reached"],"fixture_rankings":{"dense":["fact_player_daily.level_reached"],"lexical":["fact_player_daily.level_reached"]}},
+    {"id":"c09","query":"支付金额字段","category":"name","entity_type":"column","expected_ids":["fact_payment.amount"],"fixture_rankings":{"dense":["fact_payment.amount"],"lexical":["fact_payment.amount"],"alias":["fact_payment.amount"]}},
+    {"id":"c10","query":"支付币种","category":"semantic","entity_type":"column","expected_ids":["fact_payment.currency"],"fixture_rankings":{"dense":["fact_payment.currency"],"lexical":["fact_payment.currency"]}},
+    {"id":"c11","query":"关卡挑战次数","category":"alias","entity_type":"column","expected_ids":["fact_level_event.attempts"],"fixture_rankings":{"dense":["fact_level_event.attempts"],"alias":["fact_level_event.attempts"]}},
+    {"id":"c12","query":"挑战耗时秒数","category":"semantic","entity_type":"column","expected_ids":["fact_level_event.duration_seconds"],"fixture_rankings":{"dense":["fact_level_event.duration_seconds"],"lexical":["fact_level_event.duration_seconds"]}},
+
+    {"id":"m01","query":"DAU","category":"name","entity_type":"metric","expected_ids":["DAU"],"fixture_rankings":{"exact":["DAU"],"lexical":["DAU"]}},
+    {"id":"m02","query":"每日活跃玩家数","category":"semantic","entity_type":"metric","expected_ids":["DAU"],"fixture_rankings":{"dense":["DAU"],"llm_expand":["DAU"]}},
+    {"id":"m03","query":"Revenue","category":"name","entity_type":"metric","expected_ids":["Revenue"],"fixture_rankings":{"exact":["Revenue"],"lexical":["Revenue"]}},
+    {"id":"m04","query":"总流水","category":"alias","entity_type":"metric","expected_ids":["Revenue"],"fixture_rankings":{"dense":["Revenue"],"alias":["Revenue"],"llm_expand":["Revenue"]}},
+    {"id":"m05","query":"PayerCount","category":"name","entity_type":"metric","expected_ids":["PayerCount"],"fixture_rankings":{"exact":["PayerCount"]}},
+    {"id":"m06","query":"付费用户数","category":"alias","entity_type":"metric","expected_ids":["PayerCount"],"fixture_rankings":{"dense":["PayerCount"],"alias":["PayerCount"]}},
+    {"id":"m07","query":"ARPU","category":"name","entity_type":"metric","expected_ids":["ARPU"],"fixture_rankings":{"exact":["ARPU"],"lexical":["ARPU"]}},
+    {"id":"m08","query":"每个活跃用户平均收入","category":"semantic","entity_type":"metric","expected_ids":["ARPU"],"fixture_rankings":{"dense":["ARPU"],"llm_expand":["ARPU"]}},
+    {"id":"m09","query":"LevelPassRate","category":"name","entity_type":"metric","expected_ids":["LevelPassRate"],"fixture_rankings":{"exact":["LevelPassRate"]}},
+    {"id":"m10","query":"关卡通关率","category":"alias","entity_type":"metric","expected_ids":["LevelPassRate"],"fixture_rankings":{"dense":["LevelPassRate"],"alias":["LevelPassRate"],"lexical":["LevelPassRate"]}},
+
+    {"id":"v01","query":"星海远征","category":"value","entity_type":"value","expected_ids":["dim_game.game_name.星海远征"],"fixture_rankings":{"exact":["dim_game.game_name.星海远征"],"lexical":["dim_game.game_name.星海远征"]}},
+    {"id":"v02","query":"极速竞技场","category":"value","entity_type":"value","expected_ids":["dim_game.game_name.极速竞技场"],"fixture_rankings":{"lexical":["dim_game.game_name.极速竞技场"]}},
+    {"id":"v03","query":"华北地区","category":"value","entity_type":"value","expected_ids":["dim_player.region.华北"],"fixture_rankings":{"lexical":["dim_player.region.华北"]}},
+    {"id":"v04","query":"Android 平台","category":"value","entity_type":"value","expected_ids":["dim_player.platform.Android"],"fixture_rankings":{"exact":["dim_player.platform.Android"],"lexical":["dim_player.platform.Android"]}},
+    {"id":"v05","query":"CNY 币种","category":"value","entity_type":"value","expected_ids":["fact_payment.currency.CNY"],"fixture_rankings":{"lexical":["fact_payment.currency.CNY"]}},
+
+    {"id":"n01","query":"明天北京天气","category":"no_match","entity_type":"column","expected_ids":[],"fixture_rankings":{"dense":["dim_date.day"]}},
+    {"id":"n02","query":"客服工单满意度","category":"no_match","entity_type":"metric","expected_ids":[],"fixture_rankings":{}},
+    {"id":"n03","query":"查询公司股价","category":"no_match","entity_type":"column","expected_ids":[],"fixture_rankings":{}},
+    {"id":"n04","query":"仓库库存周转率","category":"no_match","entity_type":"metric","expected_ids":[],"fixture_rankings":{}},
+    {"id":"n05","query":"玩家星座分布","category":"no_match","entity_type":"column","expected_ids":[],"fixture_rankings":{}}
+  ]
+}

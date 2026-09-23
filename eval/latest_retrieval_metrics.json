@@ -1,0 +1,1286 @@
+{
+  "mode": "fixture",
+  "dataset_version": "1.0",
+  "dataset_sha256": "bb0ff025484d69a06ae89497f50af25c4456e73cd63f3e1b91b087a9f744858b",
+  "generated_at": "2026-09-23T08:54:10.950542+00:00",
+  "dataset_size": 32,
+  "channels": {
+    "dense": {
+      "hit_at_5": 0.5926,
+      "mrr": 0.5741,
+      "no_match_false_positive_rate": 0.2
+    },
+    "lexical": {
+      "hit_at_5": 0.6667,
+      "mrr": 0.6481,
+      "no_match_false_positive_rate": 0.0
+    },
+    "exact": {
+      "hit_at_5": 0.2963,
+      "mrr": 0.2963,
+      "no_match_false_positive_rate": 0.0
+    },
+    "alias": {
+      "hit_at_5": 0.3704,
+      "mrr": 0.3704,
+      "no_match_false_positive_rate": 0.0
+    },
+    "llm_expand": {
+      "hit_at_5": 0.1481,
+      "mrr": 0.1481,
+      "no_match_false_positive_rate": 0.0
+    }
+  },
+  "fused": {
+    "hit_at_5": 1.0,
+    "mrr": 1.0,
+    "no_match_false_positive_rate": 0.2
+  },
+  "ablation": {
+    "baseline": "dense_only",
+    "fusion_delta_hit_at_5": 0.4074,
+    "fusion_delta_mrr": 0.4259
+  },
+  "cases": [
+    {
+      "id": "c01",
+      "query": "按地区看玩家",
+      "category": "alias",
+      "entity_type": "column",
+      "expected_ids": [
+        "dim_player.region"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "dim_player.region"
+        ],
+        "lexical": [
+          "dim_player.platform",
+          "dim_player.region"
+        ],
+        "exact": [],
+        "alias": [
+          "dim_player.region"
+        ],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "dim_player.region",
+        "dim_player.platform"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "dim_player.region",
+          "score": 0.05137493,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "lexical",
+              "rank": 2,
+              "contribution": 0.01612903
+            },
+            {
+              "channel": "alias",
+              "rank": 1,
+              "contribution": 0.01885246
+            }
+          ]
+        },
+        {
+          "entity_id": "dim_player.platform",
+          "score": 0.01639344,
+          "evidence": [
+            {
+              "channel": "lexical",
+              "rank": 1,
+              "contribution": 0.01639344
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c02",
+      "query": "设备平台分布",
+      "category": "alias",
+      "entity_type": "column",
+      "expected_ids": [
+        "dim_player.platform"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "dim_player.platform"
+        ],
+        "lexical": [
+          "dim_player.platform"
+        ],
+        "exact": [],
+        "alias": [
+          "dim_player.platform"
+        ],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "dim_player.platform"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "dim_player.platform",
+          "score": 0.05163934,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "lexical",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "alias",
+              "rank": 1,
+              "contribution": 0.01885246
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c03",
+      "query": "获客渠道有哪些",
+      "category": "alias",
+      "entity_type": "column",
+      "expected_ids": [
+        "dim_player.acquisition_channel"
+      ],
+      "channel_rankings": {
+        "dense": [],
+        "lexical": [
+          "dim_player.acquisition_channel"
+        ],
+        "exact": [],
+        "alias": [
+          "dim_player.acquisition_channel"
+        ],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "dim_player.acquisition_channel"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "dim_player.acquisition_channel",
+          "score": 0.0352459,
+          "evidence": [
+            {
+              "channel": "lexical",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "alias",
+              "rank": 1,
+              "contribution": 0.01885246
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c04",
+      "query": "游戏名称字段",
+      "category": "name",
+      "entity_type": "column",
+      "expected_ids": [
+        "dim_game.game_name"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "dim_game.game_name"
+        ],
+        "lexical": [
+          "dim_game.game_name"
+        ],
+        "exact": [
+          "dim_game.game_name"
+        ],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "dim_game.game_name"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "dim_game.game_name",
+          "score": 0.05327869,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "lexical",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "exact",
+              "rank": 1,
+              "contribution": 0.0204918
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c05",
+      "query": "游戏品类",
+      "category": "alias",
+      "entity_type": "column",
+      "expected_ids": [
+        "dim_game.genre"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "dim_game.genre"
+        ],
+        "lexical": [],
+        "exact": [],
+        "alias": [
+          "dim_game.genre"
+        ],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "dim_game.genre"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "dim_game.genre",
+          "score": 0.0352459,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "alias",
+              "rank": 1,
+              "contribution": 0.01885246
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c06",
+      "query": "季度维度",
+      "category": "semantic",
+      "entity_type": "column",
+      "expected_ids": [
+        "dim_date.quarter"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "dim_date.month",
+          "dim_date.quarter"
+        ],
+        "lexical": [
+          "dim_date.quarter"
+        ],
+        "exact": [],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "dim_date.quarter",
+        "dim_date.month"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "dim_date.quarter",
+          "score": 0.03252247,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 2,
+              "contribution": 0.01612903
+            },
+            {
+              "channel": "lexical",
+              "rank": 1,
+              "contribution": 0.01639344
+            }
+          ]
+        },
+        {
+          "entity_id": "dim_date.month",
+          "score": 0.01639344,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c07",
+      "query": "玩家游戏时长",
+      "category": "alias",
+      "entity_type": "column",
+      "expected_ids": [
+        "fact_player_daily.online_minutes"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "fact_player_daily.online_minutes"
+        ],
+        "lexical": [],
+        "exact": [],
+        "alias": [
+          "fact_player_daily.online_minutes"
+        ],
+        "llm_expand": [
+          "fact_player_daily.online_minutes"
+        ]
+      },
+      "fused_ranking": [
+        "fact_player_daily.online_minutes"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "fact_player_daily.online_minutes",
+          "score": 0.04836066,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "alias",
+              "rank": 1,
+              "contribution": 0.01885246
+            },
+            {
+              "channel": "llm_expand",
+              "rank": 1,
+              "contribution": 0.01311475
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c08",
+      "query": "玩家达到的最高等级",
+      "category": "semantic",
+      "entity_type": "column",
+      "expected_ids": [
+        "fact_player_daily.level_reached"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "fact_player_daily.level_reached"
+        ],
+        "lexical": [
+          "fact_player_daily.level_reached"
+        ],
+        "exact": [],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "fact_player_daily.level_reached"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "fact_player_daily.level_reached",
+          "score": 0.03278689,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "lexical",
+              "rank": 1,
+              "contribution": 0.01639344
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c09",
+      "query": "支付金额字段",
+      "category": "name",
+      "entity_type": "column",
+      "expected_ids": [
+        "fact_payment.amount"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "fact_payment.amount"
+        ],
+        "lexical": [
+          "fact_payment.amount"
+        ],
+        "exact": [],
+        "alias": [
+          "fact_payment.amount"
+        ],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "fact_payment.amount"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "fact_payment.amount",
+          "score": 0.05163934,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "lexical",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "alias",
+              "rank": 1,
+              "contribution": 0.01885246
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c10",
+      "query": "支付币种",
+      "category": "semantic",
+      "entity_type": "column",
+      "expected_ids": [
+        "fact_payment.currency"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "fact_payment.currency"
+        ],
+        "lexical": [
+          "fact_payment.currency"
+        ],
+        "exact": [],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "fact_payment.currency"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "fact_payment.currency",
+          "score": 0.03278689,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "lexical",
+              "rank": 1,
+              "contribution": 0.01639344
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c11",
+      "query": "关卡挑战次数",
+      "category": "alias",
+      "entity_type": "column",
+      "expected_ids": [
+        "fact_level_event.attempts"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "fact_level_event.attempts"
+        ],
+        "lexical": [],
+        "exact": [],
+        "alias": [
+          "fact_level_event.attempts"
+        ],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "fact_level_event.attempts"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "fact_level_event.attempts",
+          "score": 0.0352459,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "alias",
+              "rank": 1,
+              "contribution": 0.01885246
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c12",
+      "query": "挑战耗时秒数",
+      "category": "semantic",
+      "entity_type": "column",
+      "expected_ids": [
+        "fact_level_event.duration_seconds"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "fact_level_event.duration_seconds"
+        ],
+        "lexical": [
+          "fact_level_event.duration_seconds"
+        ],
+        "exact": [],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "fact_level_event.duration_seconds"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "fact_level_event.duration_seconds",
+          "score": 0.03278689,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "lexical",
+              "rank": 1,
+              "contribution": 0.01639344
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m01",
+      "query": "DAU",
+      "category": "name",
+      "entity_type": "metric",
+      "expected_ids": [
+        "DAU"
+      ],
+      "channel_rankings": {
+        "dense": [],
+        "lexical": [
+          "DAU"
+        ],
+        "exact": [
+          "DAU"
+        ],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "DAU"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "DAU",
+          "score": 0.03688525,
+          "evidence": [
+            {
+              "channel": "lexical",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "exact",
+              "rank": 1,
+              "contribution": 0.0204918
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m02",
+      "query": "每日活跃玩家数",
+      "category": "semantic",
+      "entity_type": "metric",
+      "expected_ids": [
+        "DAU"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "DAU"
+        ],
+        "lexical": [],
+        "exact": [],
+        "alias": [],
+        "llm_expand": [
+          "DAU"
+        ]
+      },
+      "fused_ranking": [
+        "DAU"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "DAU",
+          "score": 0.0295082,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "llm_expand",
+              "rank": 1,
+              "contribution": 0.01311475
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m03",
+      "query": "Revenue",
+      "category": "name",
+      "entity_type": "metric",
+      "expected_ids": [
+        "Revenue"
+      ],
+      "channel_rankings": {
+        "dense": [],
+        "lexical": [
+          "Revenue"
+        ],
+        "exact": [
+          "Revenue"
+        ],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "Revenue"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "Revenue",
+          "score": 0.03688525,
+          "evidence": [
+            {
+              "channel": "lexical",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "exact",
+              "rank": 1,
+              "contribution": 0.0204918
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m04",
+      "query": "总流水",
+      "category": "alias",
+      "entity_type": "metric",
+      "expected_ids": [
+        "Revenue"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "Revenue"
+        ],
+        "lexical": [],
+        "exact": [],
+        "alias": [
+          "Revenue"
+        ],
+        "llm_expand": [
+          "Revenue"
+        ]
+      },
+      "fused_ranking": [
+        "Revenue"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "Revenue",
+          "score": 0.04836066,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "alias",
+              "rank": 1,
+              "contribution": 0.01885246
+            },
+            {
+              "channel": "llm_expand",
+              "rank": 1,
+              "contribution": 0.01311475
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m05",
+      "query": "PayerCount",
+      "category": "name",
+      "entity_type": "metric",
+      "expected_ids": [
+        "PayerCount"
+      ],
+      "channel_rankings": {
+        "dense": [],
+        "lexical": [],
+        "exact": [
+          "PayerCount"
+        ],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "PayerCount"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "PayerCount",
+          "score": 0.0204918,
+          "evidence": [
+            {
+              "channel": "exact",
+              "rank": 1,
+              "contribution": 0.0204918
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m06",
+      "query": "付费用户数",
+      "category": "alias",
+      "entity_type": "metric",
+      "expected_ids": [
+        "PayerCount"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "PayerCount"
+        ],
+        "lexical": [],
+        "exact": [],
+        "alias": [
+          "PayerCount"
+        ],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "PayerCount"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "PayerCount",
+          "score": 0.0352459,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "alias",
+              "rank": 1,
+              "contribution": 0.01885246
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m07",
+      "query": "ARPU",
+      "category": "name",
+      "entity_type": "metric",
+      "expected_ids": [
+        "ARPU"
+      ],
+      "channel_rankings": {
+        "dense": [],
+        "lexical": [
+          "ARPU"
+        ],
+        "exact": [
+          "ARPU"
+        ],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "ARPU"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "ARPU",
+          "score": 0.03688525,
+          "evidence": [
+            {
+              "channel": "lexical",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "exact",
+              "rank": 1,
+              "contribution": 0.0204918
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m08",
+      "query": "每个活跃用户平均收入",
+      "category": "semantic",
+      "entity_type": "metric",
+      "expected_ids": [
+        "ARPU"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "ARPU"
+        ],
+        "lexical": [],
+        "exact": [],
+        "alias": [],
+        "llm_expand": [
+          "ARPU"
+        ]
+      },
+      "fused_ranking": [
+        "ARPU"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "ARPU",
+          "score": 0.0295082,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "llm_expand",
+              "rank": 1,
+              "contribution": 0.01311475
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m09",
+      "query": "LevelPassRate",
+      "category": "name",
+      "entity_type": "metric",
+      "expected_ids": [
+        "LevelPassRate"
+      ],
+      "channel_rankings": {
+        "dense": [],
+        "lexical": [],
+        "exact": [
+          "LevelPassRate"
+        ],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "LevelPassRate"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "LevelPassRate",
+          "score": 0.0204918,
+          "evidence": [
+            {
+              "channel": "exact",
+              "rank": 1,
+              "contribution": 0.0204918
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m10",
+      "query": "关卡通关率",
+      "category": "alias",
+      "entity_type": "metric",
+      "expected_ids": [
+        "LevelPassRate"
+      ],
+      "channel_rankings": {
+        "dense": [
+          "LevelPassRate"
+        ],
+        "lexical": [
+          "LevelPassRate"
+        ],
+        "exact": [],
+        "alias": [
+          "LevelPassRate"
+        ],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "LevelPassRate"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "LevelPassRate",
+          "score": 0.05163934,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "lexical",
+              "rank": 1,
+              "contribution": 0.01639344
+            },
+            {
+              "channel": "alias",
+              "rank": 1,
+              "contribution": 0.01885246
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v01",
+      "query": "星海远征",
+      "category": "value",
+      "entity_type": "value",
+      "expected_ids": [
+        "dim_game.game_name.星海远征"
+      ],
+      "channel_rankings": {
+        "dense": [],
+        "lexical": [
+          "dim_game.game_name.星海远征"
+        ],
+        "exact": [
+          "dim_game.game_name.星海远征"
+        ],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "dim_game.game_name.星海远征"
+      ],
+      "fusion_applied": false,
+      "evidence": [
+        {
+          "entity_id": "dim_game.game_name.星海远征",
+          "channels": [
+            "exact_or_lexical"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v02",
+      "query": "极速竞技场",
+      "category": "value",
+      "entity_type": "value",
+      "expected_ids": [
+        "dim_game.game_name.极速竞技场"
+      ],
+      "channel_rankings": {
+        "dense": [],
+        "lexical": [
+          "dim_game.game_name.极速竞技场"
+        ],
+        "exact": [],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "dim_game.game_name.极速竞技场"
+      ],
+      "fusion_applied": false,
+      "evidence": [
+        {
+          "entity_id": "dim_game.game_name.极速竞技场",
+          "channels": [
+            "exact_or_lexical"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v03",
+      "query": "华北地区",
+      "category": "value",
+      "entity_type": "value",
+      "expected_ids": [
+        "dim_player.region.华北"
+      ],
+      "channel_rankings": {
+        "dense": [],
+        "lexical": [
+          "dim_player.region.华北"
+        ],
+        "exact": [],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "dim_player.region.华北"
+      ],
+      "fusion_applied": false,
+      "evidence": [
+        {
+          "entity_id": "dim_player.region.华北",
+          "channels": [
+            "exact_or_lexical"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v04",
+      "query": "Android 平台",
+      "category": "value",
+      "entity_type": "value",
+      "expected_ids": [
+        "dim_player.platform.Android"
+      ],
+      "channel_rankings": {
+        "dense": [],
+        "lexical": [
+          "dim_player.platform.Android"
+        ],
+        "exact": [
+          "dim_player.platform.Android"
+        ],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "dim_player.platform.Android"
+      ],
+      "fusion_applied": false,
+      "evidence": [
+        {
+          "entity_id": "dim_player.platform.Android",
+          "channels": [
+            "exact_or_lexical"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v05",
+      "query": "CNY 币种",
+      "category": "value",
+      "entity_type": "value",
+      "expected_ids": [
+        "fact_payment.currency.CNY"
+      ],
+      "channel_rankings": {
+        "dense": [],
+        "lexical": [
+          "fact_payment.currency.CNY"
+        ],
+        "exact": [],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "fact_payment.currency.CNY"
+      ],
+      "fusion_applied": false,
+      "evidence": [
+        {
+          "entity_id": "fact_payment.currency.CNY",
+          "channels": [
+            "exact_or_lexical"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "n01",
+      "query": "明天北京天气",
+      "category": "no_match",
+      "entity_type": "column",
+      "expected_ids": [],
+      "channel_rankings": {
+        "dense": [
+          "dim_date.day"
+        ],
+        "lexical": [],
+        "exact": [],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [
+        "dim_date.day"
+      ],
+      "fusion_applied": true,
+      "evidence": [
+        {
+          "entity_id": "dim_date.day",
+          "score": 0.01639344,
+          "evidence": [
+            {
+              "channel": "dense",
+              "rank": 1,
+              "contribution": 0.01639344
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "n02",
+      "query": "客服工单满意度",
+      "category": "no_match",
+      "entity_type": "metric",
+      "expected_ids": [],
+      "channel_rankings": {
+        "dense": [],
+        "lexical": [],
+        "exact": [],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [],
+      "fusion_applied": true,
+      "evidence": []
+    },
+    {
+      "id": "n03",
+      "query": "查询公司股价",
+      "category": "no_match",
+      "entity_type": "column",
+      "expected_ids": [],
+      "channel_rankings": {
+        "dense": [],
+        "lexical": [],
+        "exact": [],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [],
+      "fusion_applied": true,
+      "evidence": []
+    },
+    {
+      "id": "n04",
+      "query": "仓库库存周转率",
+      "category": "no_match",
+      "entity_type": "metric",
+      "expected_ids": [],
+      "channel_rankings": {
+        "dense": [],
+        "lexical": [],
+        "exact": [],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [],
+      "fusion_applied": true,
+      "evidence": []
+    },
+    {
+      "id": "n05",
+      "query": "玩家星座分布",
+      "category": "no_match",
+      "entity_type": "column",
+      "expected_ids": [],
+      "channel_rankings": {
+        "dense": [],
+        "lexical": [],
+        "exact": [],
+        "alias": [],
+        "llm_expand": []
+      },
+      "fused_ranking": [],
+      "fusion_applied": true,
+      "evidence": []
+    }
+  ]
+}
