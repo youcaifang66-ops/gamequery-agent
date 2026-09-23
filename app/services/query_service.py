@@ -24,6 +24,14 @@ from app.security.sql_guard import SQLGuard
 SAFE_RUNTIME_ERRORS = {
     "RETRIEVAL_UNAVAILABLE": "检索服务暂时不可用，请稍后重试。",
 }
+NON_CORRECTABLE_GUARD_CODES = {
+    "MULTI_STATEMENT_DENIED",
+    "NON_QUERY_DENIED",
+    "WRITE_OPERATION_DENIED",
+    "SYSTEM_OBJECT_DENIED",
+    "LOCKING_READ_DENIED",
+    "DANGEROUS_FUNCTION_DENIED",
+}
 
 
 class QueryService:
@@ -99,6 +107,29 @@ class QueryService:
             # 客户端已经断开，清理失败只能留给日志/运维，不能覆盖取消异常。
             return
 
+    async def _graph_error_event(
+        self, request_id: str, payload: dict[str, Any]
+    ) -> tuple[int, str]:
+        internal_code = str(payload.get("code") or "INTERNAL_ERROR")
+        trace_payload = self._trace_payload("error", payload)
+        sequence = await self.trace_store.append(request_id, "error", trace_payload)
+        await self.trace_store.finish(
+            request_id, "failed", error_code=internal_code
+        )
+        public_code = (
+            "SQL_POLICY_DENIED"
+            if internal_code in NON_CORRECTABLE_GUARD_CODES
+            else internal_code
+        )
+        envelope = {
+            "type": "error",
+            "request_id": request_id,
+            "sequence": sequence,
+            "code": public_code,
+            "message": str(payload.get("message") or "查询失败，请稍后重试。"),
+        }
+        return sequence, encode_sse("error", envelope)
+
     async def _failed_event(
         self,
         request_id: str,
@@ -145,8 +176,15 @@ class QueryService:
                     stream_mode="custom",
                 ):
                     event_type = raw_chunk.get("type", "progress")
-                    if event_type not in ALLOWED_EVENT_TYPES - {"done", "error"}:
+                    if event_type not in ALLOWED_EVENT_TYPES - {"done"}:
                         raise RuntimeError("unsupported graph event")
+                    if event_type == "error":
+                        last_sequence, message = await self._graph_error_event(
+                            request_id, raw_chunk
+                        )
+                        terminal_sent = True
+                        yield message
+                        return
                     if event_type == "result":
                         result_seen = True
                     if event_type == "clarification":

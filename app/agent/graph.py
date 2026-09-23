@@ -18,6 +18,7 @@ from app.agent.context import DataAgentContext
 from app.agent.nodes.add_extra_context import add_extra_context
 from app.agent.nodes.correct_sql import correct_sql
 from app.agent.nodes.extract_keywords import extract_keywords
+from app.agent.nodes.fail_sql import fail_sql
 from app.agent.nodes.filter_metric import filter_metric
 from app.agent.nodes.filter_table import filter_table
 from app.agent.nodes.generate_sql import generate_sql
@@ -55,6 +56,7 @@ DEFAULT_NODES: dict[str, Callable[..., Any]] = {
     "validate_sql": validate_sql,
     "correct_sql": correct_sql,
     "run_sql": run_sql,
+    "fail_sql": fail_sql,
 }
 
 def route_after_validation(state: DataAgentState):
@@ -106,10 +108,15 @@ def build_graph(
     graph_builder.add_conditional_edges(
         source="validate_sql",
         path=route_after_validation,
-        path_map={"run_sql": "run_sql", "correct_sql": "correct_sql", "end": END},
+        path_map={
+            "run_sql": "run_sql",
+            "correct_sql": "correct_sql",
+            "end": "fail_sql",
+        },
     )
     graph_builder.add_edge("correct_sql", "validate_sql")
     graph_builder.add_edge("run_sql", END)
+    graph_builder.add_edge("fail_sql", END)
     return graph_builder.compile()
 
 
