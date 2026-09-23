@@ -105,10 +105,21 @@ export default function App() {
           if (event.type === "result") {
             return {
               ...message,
-              status: "done",
               content: summarizeResult(event.data),
               result: event.data,
             };
+          }
+
+          if (event.type === "sql") {
+            return { ...message, content: "SQL 已通过安全校验，正在执行查询。" };
+          }
+
+          if (event.type === "clarification") {
+            return { ...message, content: event.message };
+          }
+
+          if (event.type === "done") {
+            return { ...message, status: "done" };
           }
 
           return {

@@ -33,6 +33,23 @@ export async function streamQuery(query: string, options: QueryOptions) {
   const reader = response.body.getReader();
   const decoder = new TextDecoder("utf-8");
   let buffer = "";
+  let requestId: string | null = null;
+  let lastSequence = 0;
+  let terminal = false;
+
+  const emit = (event: AgentEvent) => {
+    if (terminal) return;
+    if (requestId !== null && event.request_id !== requestId) {
+      throw new Error("后端事件 request_id 在同一条流中发生变化。");
+    }
+    if (event.sequence !== lastSequence + 1) {
+      throw new Error("后端事件 sequence 不连续。");
+    }
+    requestId = event.request_id;
+    lastSequence = event.sequence;
+    options.onEvent(event);
+    terminal = event.type === "done" || event.type === "error";
+  };
 
   while (true) {
     const { value, done } = await reader.read();
@@ -45,15 +62,19 @@ export async function streamQuery(query: string, options: QueryOptions) {
     for (const chunk of chunks) {
       const event = parseSseChunk(chunk);
       if (event) {
-        options.onEvent(event);
+        emit(event);
       }
+    }
+    if (terminal) {
+      await reader.cancel();
+      return;
     }
   }
 
   buffer += decoder.decode();
   const tail = parseSseChunk(buffer);
   if (tail) {
-    options.onEvent(tail);
+    emit(tail);
   }
 }
 
@@ -68,11 +89,18 @@ function parseSseChunk(chunk: string): AgentEvent | null {
   if (!payload) return null;
 
   try {
-    return JSON.parse(payload) as AgentEvent;
+    const event = JSON.parse(payload) as AgentEvent;
+    if (
+      !event ||
+      typeof event !== "object" ||
+      typeof event.type !== "string" ||
+      typeof event.request_id !== "string" ||
+      !Number.isInteger(event.sequence)
+    ) {
+      throw new Error("后端事件缺少 type、request_id 或 sequence。");
+    }
+    return event;
   } catch {
-    return {
-      type: "error",
-      message: `无法解析后端事件：${payload}`,
-    };
+    throw new Error("无法解析后端 SSE 事件。");
   }
 }

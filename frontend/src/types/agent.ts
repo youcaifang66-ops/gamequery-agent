@@ -1,26 +1,53 @@
-/**
- * 智能体类型定义
- * 定义问数智能体前端使用的 SSE 事件、流程步骤和聊天消息类型
- */
+/** 后端 SSE 事件的公共可追踪字段。 */
+export type EventEnvelope = {
+  request_id: string;
+  sequence: number;
+};
+
 export type ProgressStatus = "running" | "success" | "error";
 
-export type ProgressEvent = {
+export type ProgressEvent = EventEnvelope & {
   type: "progress";
   step: string;
   status: ProgressStatus;
 };
 
-export type ResultEvent = {
+export type SqlEvent = EventEnvelope & {
+  type: "sql";
+  version: number;
+  sql: string;
+};
+
+export type ResultEvent = EventEnvelope & {
   type: "result";
   data: unknown;
 };
 
-export type ErrorEvent = {
-  type: "error";
+export type ClarificationEvent = EventEnvelope & {
+  type: "clarification";
+  code: string;
+  missing_slots: string[];
   message: string;
 };
 
-export type AgentEvent = ProgressEvent | ResultEvent | ErrorEvent;
+export type ErrorEvent = EventEnvelope & {
+  type: "error";
+  code: string;
+  message: string;
+};
+
+export type DoneEvent = EventEnvelope & {
+  type: "done";
+  status: "completed" | "clarification";
+};
+
+export type AgentEvent =
+  | ProgressEvent
+  | SqlEvent
+  | ResultEvent
+  | ClarificationEvent
+  | ErrorEvent
+  | DoneEvent;
 
 export type StepState = {
   step: string;
