@@ -38,7 +38,7 @@ def rows(connection, sql):
     return [list(row) for row in connection.execute(sql).fetchall()]
 
 
-def evaluate():
+def evaluate(*, write_report: bool = False):
     dataset_path = ROOT / "eval" / "sql_benchmark.json"
     dataset_bytes = dataset_path.read_bytes()
     workload = json.loads(dataset_bytes.decode("utf-8"))
@@ -96,12 +96,13 @@ def evaluate():
             sorted(latencies)[math.ceil(len(latencies) * 0.95) - 1], 3
         ),
     }
-    (ROOT / "eval" / "latest_metrics.json").write_text(
-        json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    if write_report:
+        (ROOT / "eval" / "latest_metrics.json").write_text(
+            json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
     connection.close()
     return result
 
 
 if __name__ == "__main__":
-    print(json.dumps(evaluate(), ensure_ascii=False, indent=2))
+    print(json.dumps(evaluate(write_report=True), ensure_ascii=False, indent=2))

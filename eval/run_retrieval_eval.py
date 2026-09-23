@@ -86,7 +86,7 @@ def fused_ranking(case: dict) -> tuple[list[str], list[dict], bool]:
     )
 
 
-def evaluate(mode: str = "fixture") -> dict:
+def evaluate(mode: str = "fixture", *, write_report: bool = False) -> dict:
     if mode != "fixture":
         raise RuntimeError("live mode requires configured Qdrant and embedding services")
     dataset_path = ROOT / "eval" / "retrieval_benchmark.json"
@@ -142,10 +142,11 @@ def evaluate(mode: str = "fixture") -> dict:
         },
         "cases": case_reports,
     }
-    (ROOT / "eval" / "latest_retrieval_metrics.json").write_text(
-        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    if write_report:
+        (ROOT / "eval" / "latest_retrieval_metrics.json").write_text(
+            json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
     return report
 
 
@@ -153,4 +154,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices=["fixture", "live"], default="fixture")
     args = parser.parse_args()
-    print(json.dumps(evaluate(args.mode), ensure_ascii=False, indent=2))
+    print(
+        json.dumps(
+            evaluate(args.mode, write_report=True), ensure_ascii=False, indent=2
+        )
+    )
