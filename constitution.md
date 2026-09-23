@@ -31,7 +31,9 @@ Last updated: 2026-09-23
 | 向量检索 | Qdrant Server 1.16 + qdrant-client 1.17.1 | 索引和查询契约必须版本化 |
 | 词法检索 | Elasticsearch 8.19.10 / client 8.19.3 | 仅存检索元数据，不作为事实库 |
 | 模型接入 | OpenAI-compatible API | CI 不依赖真实模型调用 |
+| 异步审计存储 | aiosqlite 0.x | 仅用于轻量单实例追踪；多实例需另立迁移规格 |
 | 后端测试 | pytest | 每个任务测试先行 |
+| 负载测试 | Locust 2.x | 仅作为开发依赖，报告必须记录运行环境 |
 | 代码质量 | Ruff | CI 中 lint 与测试均为硬门禁 |
 | 前端 | React + TypeScript + Vite | 保持既有 SSE 契约兼容 |
 
