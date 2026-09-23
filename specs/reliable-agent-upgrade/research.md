@@ -4,6 +4,15 @@
 阶段：SDD Phase 0.5
 范围：在线查询链路、检索、SQL 安全、追踪、评测、部署与测试
 
+## 相关文件清单
+
+- API 与服务：`app/api/routers/query_router.py`、`app/api/dependencies.py`、`app/api/schemas/query_schema.py`、`app/api/sse.py`、`app/services/query_service.py`。（`app/api/routers/query_router.py:14-34`；`app/api/dependencies.py:15-27`）
+- 工作流：`app/agent/graph.py`、`app/agent/state.py`、`app/agent/context.py` 与 `app/agent/nodes/` 下的召回、合并、校验、纠错、执行节点。（`app/agent/graph.py:15-40`）
+- 安全与执行：`app/security/sql_guard.py`、`app/repositories/mysql/dw/dw_mysql_repository.py`、`docker/mysql/dw.sql`。（`app/security/sql_guard.py:20-72`；`app/repositories/mysql/dw/dw_mysql_repository.py:14-54`）
+- 检索与追踪：`app/retrieval/fusion.py`、`app/observability/trace_store.py`。（`app/retrieval/fusion.py:1-54`；`app/observability/trace_store.py:1-69`）
+- 配置与部署：`conf/app_config.yaml`、`conf/meta_config.yaml`、`docker/docker-compose.yaml`、`pyproject.toml`。（`conf/app_config.yaml:1-44`；`docker/docker-compose.yaml:1-93`）
+- 验证证据：`tests/`、`eval/sql_benchmark.json`、`eval/run_sql_eval.py`、`.github/workflows/ci.yml`。（`.github/workflows/ci.yml:1-35`；`eval/run_sql_eval.py:39-87`）
+
 ## 入口与依赖组装
 
 - `POST /api/query` 接收 `QuerySchema`，通过 FastAPI `Depends` 获取 `QueryService`，并把服务的异步生成器作为 `text/event-stream` 返回。（`app/api/routers/query_router.py:22-34`）
