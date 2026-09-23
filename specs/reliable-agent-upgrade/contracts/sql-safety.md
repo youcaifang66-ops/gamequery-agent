@@ -35,6 +35,8 @@ raises SQLPolicyError(code, safe_message, correctable)
 | READ_ONLY_QUERY_REQUIRED | no | terminal safety error |
 | WRITE_OPERATION_DENIED | no | terminal safety error |
 | SYSTEM_OBJECT_DENIED | no | terminal safety error |
+| DANGEROUS_FUNCTION_DENIED | no | terminal safety error |
+| LOCKING_QUERY_DENIED | no | terminal safety error |
 | INVALID_LIMIT | no | terminal safety error |
 
 External API maps all non-correctable guard codes to `SQL_POLICY_DENIED`; internal trace keeps the specific code.
