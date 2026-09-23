@@ -34,6 +34,8 @@ def test_runtime_config_has_bounded_query_and_trace_settings(monkeypatch):
     assert config.query.max_correction_attempts == 2
     assert config.trace.database_path.endswith("traces.sqlite3")
     assert config.trace.busy_timeout_ms == 5_000
+    assert config.db_meta.user == "gamequery_meta"
+    assert config.db_dw.user == "gamequery_reader"
 
 
 def test_committed_config_has_no_default_database_password():

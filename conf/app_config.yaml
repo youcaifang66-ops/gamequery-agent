@@ -12,14 +12,14 @@ logging:
 db_meta:
   host: ${oc.env:META_DB_HOST,localhost}
   port: 3306
-  user: didilili
+  user: ${oc.env:META_DB_USER,gamequery_meta}
   password: ${oc.env:META_DB_PASSWORD}
   database: meta
 
 db_dw:
   host: ${oc.env:DW_DB_HOST,localhost}
   port: 3306
-  user: didilili
+  user: ${oc.env:DW_DB_USER,gamequery_reader}
   password: ${oc.env:DW_DB_PASSWORD}
   database: dw
 

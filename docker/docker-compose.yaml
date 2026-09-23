@@ -9,8 +9,11 @@ services:
     environment:
       LLM_API_KEY: ${LLM_API_KEY}
       META_DB_HOST: mysql
+      META_DB_USER: gamequery_meta
+      META_DB_PASSWORD: ${META_DB_PASSWORD:?META_DB_PASSWORD is required}
       DW_DB_HOST: mysql
-      MYSQL_PASSWORD: dili123
+      DW_DB_USER: gamequery_reader
+      DW_DB_PASSWORD: ${DW_DB_PASSWORD:?DW_DB_PASSWORD is required}
       QDRANT_HOST: qdrant
       EMBEDDING_HOST: embedding
       ES_HOST: elasticsearch
@@ -30,9 +33,9 @@ services:
     container_name: mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: dili123
-      MYSQL_USER: didilili
-      MYSQL_PASSWORD: dili123
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required}
+      META_DB_PASSWORD: ${META_DB_PASSWORD:?META_DB_PASSWORD is required}
+      DW_DB_PASSWORD: ${DW_DB_PASSWORD:?DW_DB_PASSWORD is required}
     ports:
       - "3306:3306"
     volumes:
