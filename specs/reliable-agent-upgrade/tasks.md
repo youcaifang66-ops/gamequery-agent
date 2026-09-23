@@ -11,13 +11,21 @@
 - **Work:** 添加最大行数、数据库超时、追踪路径、无默认密码以及开发依赖分组的失败测试。
 - **Depends on:** none
 
-### T01-IMPL 配置与成熟轮子 [S]
+### T01-IMPL-A 类型化运行配置 [S]
 
-- **Files:** `conf/app_config.yaml`, `pyproject.toml`, `uv.lock`
+- **Files:** `app/conf/app_config.py`, `conf/app_config.yaml`
 - **Contracts:** `sql-safety.md`, `trace-store.md`, `evaluation.md`
 - **Satisfies:** AC-03, AC-08, AC-11, AC-23
-- **Work:** 添加类型化配置；运行时加入 aiosqlite；开发依赖加入 Locust；更新锁文件。
+- **Work:** 添加最大行数、数据库超时、请求边界、追踪路径和 busy timeout 类型化配置，移除数据库默认密码。
 - **Depends on:** T01-TEST
+
+### T01-IMPL-B 成熟依赖与锁文件 [S]
+
+- **Files:** `pyproject.toml`, `uv.lock`
+- **Contracts:** `trace-store.md`, `evaluation.md`
+- **Satisfies:** AC-11, AC-23
+- **Work:** 运行时加入 aiosqlite；开发依赖加入 Locust；更新锁文件。
+- **Depends on:** T01-IMPL-A
 - **Commit:** `build: add reliability runtime configuration`
 
 ### T02-TEST SQLGuard 边界矩阵 [M]

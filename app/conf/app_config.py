@@ -88,6 +88,30 @@ class LLMConfig:
 
 
 @dataclass
+class SQLPolicyConfig:
+    """SQL 安全策略与数据库执行预算。"""
+
+    max_rows: int
+    statement_timeout_ms: int
+
+
+@dataclass
+class QueryConfig:
+    """单次 LangGraph 查询的全局边界。"""
+
+    request_timeout_seconds: int
+    max_correction_attempts: int
+
+
+@dataclass
+class TraceConfig:
+    """轻量审计追踪存储配置。"""
+
+    database_path: str
+    busy_timeout_ms: int
+
+
+@dataclass
 class AppConfig:
     """项目级总配置入口"""
 
@@ -98,6 +122,9 @@ class AppConfig:
     embedding: EmbeddingConfig
     es: ESConfig
     llm: LLMConfig
+    sql_policy: SQLPolicyConfig
+    query: QueryConfig
+    trace: TraceConfig
 
 
 # 从当前文件位置回到项目根目录，再定位到 conf/app_config.yaml

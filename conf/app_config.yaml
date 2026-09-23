@@ -13,14 +13,14 @@ db_meta:
   host: ${oc.env:META_DB_HOST,localhost}
   port: 3306
   user: didilili
-  password: ${oc.env:MYSQL_PASSWORD,dili123}
+  password: ${oc.env:META_DB_PASSWORD}
   database: meta
 
 db_dw:
   host: ${oc.env:DW_DB_HOST,localhost}
   port: 3306
   user: didilili
-  password: ${oc.env:MYSQL_PASSWORD,dili123}
+  password: ${oc.env:DW_DB_PASSWORD}
   database: dw
 
 qdrant:
@@ -42,3 +42,15 @@ llm:
   model_name: Pro/zai-org/GLM-5.1
   api_key: ${oc.env:LLM_API_KEY}
   base_url: https://api.siliconflow.cn/v1
+
+sql_policy:
+  max_rows: 500
+  statement_timeout_ms: 5000
+
+query:
+  request_timeout_seconds: 60
+  max_correction_attempts: 2
+
+trace:
+  database_path: ${oc.env:TRACE_DATABASE_PATH,data/traces.sqlite3}
+  busy_timeout_ms: 5000

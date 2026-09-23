@@ -5,6 +5,7 @@ description = "A LangGraph Text-to-SQL agent for game operations analytics"
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
 dependencies = [
+    "aiosqlite>=0.22.1",
     "asyncmy>=0.2.11",
     "cryptography>=46.0.7",
     "elasticsearch[async]>=8,<9",
@@ -27,6 +28,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "locust>=2.46.6",
     "pre-commit>=4.3.0",
     "pytest>=8.3.0",
     "ruff>=0.11.0",
@@ -35,6 +37,10 @@ dev = [
 [tool.ruff]
 line-length = 88
 target-version = "py312"
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
+default = true
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
