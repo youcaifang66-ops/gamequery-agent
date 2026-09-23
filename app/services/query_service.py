@@ -19,6 +19,7 @@ from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
 from app.repositories.mysql.meta.meta_mysql_repository import MetaMySQLRepository
 from app.repositories.qdrant.column_qdrant_repository import ColumnQdrantRepository
 from app.repositories.qdrant.metric_qdrant_repository import MetricQdrantRepository
+from app.security.sql_guard import SQLGuard
 
 
 class QueryService:
@@ -32,6 +33,7 @@ class QueryService:
         column_qdrant_repository: ColumnQdrantRepository,
         metric_qdrant_repository: MetricQdrantRepository,
         value_es_repository: ValueESRepository,
+        sql_guard: SQLGuard,
     ):
         # MySQL 仓储分别负责元数据补全和真实数仓环境信息读取
         self.meta_mysql_repository = meta_mysql_repository
@@ -42,6 +44,7 @@ class QueryService:
         self.column_qdrant_repository = column_qdrant_repository
         self.metric_qdrant_repository = metric_qdrant_repository
         self.value_es_repository = value_es_repository
+        self.sql_guard = sql_guard
 
     async def query(self, query: str):
         """执行一次问数工作流，并逐段产出 SSE 消息"""
@@ -56,6 +59,7 @@ class QueryService:
             value_es_repository=self.value_es_repository,
             meta_mysql_repository=self.meta_mysql_repository,
             dw_mysql_repository=self.dw_mysql_repository,
+            sql_guard=self.sql_guard,
         )
         try:
             # stream_mode="custom" 对应节点内部 writer(...) 写出的进度消息

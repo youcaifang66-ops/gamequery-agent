@@ -6,6 +6,8 @@ FastAPI 依赖组装
 都收敛在这里，避免 HTTP 处理函数直接感知底层基础设施。
 """
 
+from functools import lru_cache
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends
@@ -19,12 +21,26 @@ from app.clients.mysql_client_manager import (
     meta_mysql_client_manager,
 )
 from app.clients.qdrant_client_manager import qdrant_client_manager
+from app.conf.app_config import app_config
 from app.repositories.es.value_es_repository import ValueESRepository
 from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
 from app.repositories.mysql.meta.meta_mysql_repository import MetaMySQLRepository
 from app.repositories.qdrant.column_qdrant_repository import ColumnQdrantRepository
 from app.repositories.qdrant.metric_qdrant_repository import MetricQdrantRepository
+from app.security.sql_guard import SQLGuard
 from app.services.query_service import QueryService
+
+
+@lru_cache(maxsize=1)
+def get_sql_guard() -> SQLGuard:
+    """从受版本控制的元数据白名单创建进程级 SQL 策略对象。"""
+
+    meta_config_path = Path(__file__).parents[2] / "conf" / "meta_config.yaml"
+    return SQLGuard.from_meta_config(
+        meta_config_path,
+        max_rows=app_config.sql_policy.max_rows,
+        statement_timeout_ms=app_config.sql_policy.statement_timeout_ms,
+    )
 
 
 async def get_meta_session():
@@ -97,6 +113,7 @@ async def get_query_service(
         MetricQdrantRepository, Depends(get_metric_qdrant_repository)
     ],
     value_es_repository: Annotated[ValueESRepository, Depends(get_value_es_repository)],
+    sql_guard: Annotated[SQLGuard, Depends(get_sql_guard)],
 ) -> QueryService:
     """组装一次查询所需的业务服务"""
 
@@ -108,4 +125,5 @@ async def get_query_service(
         column_qdrant_repository=column_qdrant_repository,
         metric_qdrant_repository=metric_qdrant_repository,
         value_es_repository=value_es_repository,
+        sql_guard=sql_guard,
     )
