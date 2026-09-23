@@ -17,6 +17,13 @@ from app.clients.mysql_client_manager import (
     meta_mysql_client_manager,
 )
 from app.clients.qdrant_client_manager import qdrant_client_manager
+from app.conf.app_config import app_config
+from app.observability.trace_store import AsyncSQLiteTraceStore
+
+trace_store = AsyncSQLiteTraceStore(
+    app_config.trace.database_path,
+    busy_timeout_ms=app_config.trace.busy_timeout_ms,
+)
 
 
 @asynccontextmanager
@@ -29,12 +36,15 @@ async def lifespan(app: FastAPI):
     es_client_manager.init()
     meta_mysql_client_manager.init()
     dw_mysql_client_manager.init()
+    await trace_store.open()
 
     # yield 之前是启动逻辑，yield 之后是关闭逻辑；中间阶段由 FastAPI 正常处理请求
-    yield
-
-    # 关闭阶段：按应用级资源统一释放连接，避免进程退出前留下未关闭的网络连接
-    await qdrant_client_manager.close()
-    await es_client_manager.close()
-    await meta_mysql_client_manager.close()
-    await dw_mysql_client_manager.close()
+    try:
+        yield
+    finally:
+        # 关闭阶段：按应用级资源统一释放连接，避免进程退出前留下未关闭的网络连接
+        await trace_store.close()
+        await qdrant_client_manager.close()
+        await es_client_manager.close()
+        await meta_mysql_client_manager.close()
+        await dw_mysql_client_manager.close()

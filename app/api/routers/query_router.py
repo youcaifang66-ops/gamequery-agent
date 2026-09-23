@@ -13,6 +13,7 @@ from starlette.responses import StreamingResponse
 
 from app.api.dependencies import get_query_service
 from app.api.schemas.query_schema import QuerySchema
+from app.core.context import request_id_ctx_var
 from app.services.query_service import QueryService
 
 # 当前模块只维护查询相关接口，避免后续所有 API 都挤在 main.py 中
@@ -30,6 +31,6 @@ async def query_handler(
 
     return StreamingResponse(
         # query.query 是用户问题字符串；QueryService.query 返回异步生成器供响应逐段消费
-        query_service.query(query.query),
+        query_service.query(query.query, request_id=request_id_ctx_var.get()),
         media_type="text/event-stream",
     )

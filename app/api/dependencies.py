@@ -14,6 +14,7 @@ from fastapi import Depends
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.lifespan import trace_store
 from app.clients.embedding_client_manager import embedding_client_manager
 from app.clients.es_client_manager import es_client_manager
 from app.clients.mysql_client_manager import (
@@ -22,6 +23,7 @@ from app.clients.mysql_client_manager import (
 )
 from app.clients.qdrant_client_manager import qdrant_client_manager
 from app.conf.app_config import app_config
+from app.observability.trace_store import AsyncSQLiteTraceStore
 from app.repositories.es.value_es_repository import ValueESRepository
 from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
 from app.repositories.mysql.meta.meta_mysql_repository import MetaMySQLRepository
@@ -29,6 +31,12 @@ from app.repositories.qdrant.column_qdrant_repository import ColumnQdrantReposit
 from app.repositories.qdrant.metric_qdrant_repository import MetricQdrantRepository
 from app.security.sql_guard import SQLGuard
 from app.services.query_service import QueryService
+
+
+async def get_trace_store() -> AsyncSQLiteTraceStore:
+    """返回由 FastAPI lifespan 打开并复用的审计存储。"""
+
+    return trace_store
 
 
 @lru_cache(maxsize=1)
@@ -114,6 +122,7 @@ async def get_query_service(
     ],
     value_es_repository: Annotated[ValueESRepository, Depends(get_value_es_repository)],
     sql_guard: Annotated[SQLGuard, Depends(get_sql_guard)],
+    query_trace_store: Annotated[AsyncSQLiteTraceStore, Depends(get_trace_store)],
 ) -> QueryService:
     """组装一次查询所需的业务服务"""
 
@@ -126,4 +135,5 @@ async def get_query_service(
         metric_qdrant_repository=metric_qdrant_repository,
         value_es_repository=value_es_repository,
         sql_guard=sql_guard,
+        trace_store=query_trace_store,
     )

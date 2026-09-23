@@ -1,6 +1,13 @@
 import json
 
-ALLOWED_EVENT_TYPES = {"progress", "sql", "result", "error", "done"}
+ALLOWED_EVENT_TYPES = {
+    "progress",
+    "sql",
+    "result",
+    "clarification",
+    "error",
+    "done",
+}
 
 
 def encode_sse(event_type: str, payload: dict) -> str:
