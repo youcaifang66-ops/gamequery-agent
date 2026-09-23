@@ -25,7 +25,7 @@ class FakeRepository:
         self.delay = delay
         self.validated = []
 
-    async def validate(self, sql):
+    async def validate(self, sql, *, timeout_ms):
         self.validated.append(sql)
         if self.delay:
             await asyncio.sleep(self.delay)

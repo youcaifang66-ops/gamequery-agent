@@ -7,6 +7,8 @@
 SQL 生成闭环中的数据库环境读取 SQL 校验和最终查询执行也集中放在这里
 """
 
+import asyncio
+
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -43,12 +45,34 @@ class DWMySQLRepository:
         dialect = self.session.bind.dialect.name
         return {"dialect": dialect, "version": version}
 
-    async def validate(self, sql: str):
+    async def validate(self, sql: str, *, timeout_ms: int = 5_000):
         """用 EXPLAIN 让数据库提前解析 SQL，发现语法 表名 字段名等错误"""
-        sql = f"explain {sql}"
-        await self.session.execute(text(sql))
+        if timeout_ms < 1:
+            raise ValueError("timeout_ms must be positive")
+        try:
+            async with asyncio.timeout(timeout_ms / 1_000):
+                await self.session.execute(text(f"EXPLAIN {sql}"))
+        except BaseException:
+            await asyncio.shield(self.session.rollback())
+            raise
 
-    async def run(self, sql: str) -> list[dict]:
+    async def run(
+        self,
+        sql: str,
+        *,
+        timeout_ms: int = 5_000,
+        max_rows: int = 500,
+    ) -> list[dict]:
         """执行最终 SQL，并把 SQLAlchemy 行对象转换成前端更易消费的字典列表"""
-        result = await self.session.execute(text(sql))
-        return [dict(row) for row in result.mappings().fetchall()]
+        if timeout_ms < 1:
+            raise ValueError("timeout_ms must be positive")
+        if max_rows < 1:
+            raise ValueError("max_rows must be positive")
+        try:
+            async with asyncio.timeout(timeout_ms / 1_000):
+                result = await self.session.execute(text(sql))
+                rows = result.mappings().fetchmany(max_rows)
+                return [dict(row) for row in rows]
+        except BaseException:
+            await asyncio.shield(self.session.rollback())
+            raise

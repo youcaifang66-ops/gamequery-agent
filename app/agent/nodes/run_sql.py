@@ -20,17 +20,24 @@ async def run_sql(state: DataAgentState, runtime: Runtime[DataAgentContext]):
     writer({"type": "progress", "step": step, "status": "running"})
 
     try:
-        # 这里拿到的可能是 generate_sql 直接通过校验的 SQL，也可能是 correct_sql 覆盖后的 SQL
         sql = state["sql"]
+        validated_sql = state.get("validated_sql")
+        policy = state.get("sql_policy")
+        if validated_sql is None or sql != validated_sql or policy is None:
+            raise RuntimeError("validated SQL invariant violated")
+
         dw_mysql_repository = runtime.context["dw_mysql_repository"]
 
-        # 真实数据库访问统一封装在仓储层，节点只负责从状态取 SQL 并触发执行
-        result = await dw_mysql_repository.run(sql)
-        logger.info(f"SQL执行结果：{result}")
+        result = await dw_mysql_repository.run(
+            validated_sql,
+            timeout_ms=policy["timeout_ms"],
+            max_rows=policy["max_rows"],
+        )
+        logger.info(f"SQL执行完成，返回 {len(result)} 行")
         writer({"type": "progress", "step": step, "status": "success"})
         writer({"type": "result", "data": result})
 
-    except Exception as e:
-        logger.error(f"{step} failed: {e}")
+    except Exception as error:
+        logger.error(f"{step} failed: {type(error).__name__}")
         writer({"type": "progress", "step": step, "status": "error"})
         raise

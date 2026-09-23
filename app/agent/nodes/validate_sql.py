@@ -74,7 +74,10 @@ async def validate_sql(state: DataAgentState, runtime: Runtime[DataAgentContext]
 
         try:
             async with asyncio.timeout(guarded.timeout_ms / 1_000):
-                await dw_mysql_repository.validate(guarded.sql)
+                await dw_mysql_repository.validate(
+                    guarded.sql,
+                    timeout_ms=guarded.timeout_ms,
+                )
             writer({"type": "progress", "step": step, "status": "success"})
             logger.info("SQL安全策略与数据库预检通过")
             return {
@@ -102,7 +105,7 @@ async def validate_sql(state: DataAgentState, runtime: Runtime[DataAgentContext]
                 correctable=True,
             )
 
-    except Exception as e:
-        logger.error(f"{step} failed: {e}")
+    except Exception as error:
+        logger.error(f"{step} failed: {type(error).__name__}")
         writer({"type": "progress", "step": step, "status": "error"})
         raise
