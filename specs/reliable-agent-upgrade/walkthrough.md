@@ -61,7 +61,7 @@ State 只放可序列化业务数据；MySQL、Qdrant、Elasticsearch、Embeddin
 - SQL fixture：20 条固定样例用于验证 Guard 和预设修复器。Guard accuracy 1.0 不等于 LLM Text-to-SQL 准确率。
 - 检索 fixture：32 条固定候选排序用于验证评测器、RRF 与消融合同。融合 Hit@5/MRR 1.0 是 fixture 结果，不是线上 Qdrant 质量。
 - 服务集成：CI 中真实 MySQL 与 Qdrant 证明权限和协议兼容，但没有覆盖真实 LLM、Elasticsearch 全链路或企业数据分布。
-- 规模：已具备 10 万/100 万可复现生成器和 Locust 场景；未做正式目标硬件压测，不宣称千万级或具体 QPS。
+- 规模：该轮验收当时只具备 10 万/100 万生成器；后续千万级合成数据、隔离 MySQL 导入与固定查询实测见 `specs/synthetic-business-scale/validation.md`。新证据仍不代表生产容量上限或端到端 Agent P95。
 
 ## 8. 最短代码阅读顺序
 

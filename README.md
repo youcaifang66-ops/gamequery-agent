@@ -204,6 +204,33 @@ uv run python eval/run_sql_eval.py
 uv run python eval/run_retrieval_eval.py --mode fixture
 ```
 
+### 千万级合成数据与数据库实证
+
+项目已在一台本地 Windows 11 主机（16.84 GB 内存、MySQL 8.0.26）上实际生成并导入 **10,000,000 条事实记录**，不是把 100 万结果线性外推到千万。数据由固定种子生成，包含 600 万玩家日活、200 万支付、200 万关卡事件和 25 万玩家维度；独立全扫描重新核对了 SHA-256、行数、全部维度引用、业务分布和六类标准答案。
+
+| 实验 | 本机实测结果 | 适用边界 |
+|---|---:|---|
+| 流式生成 | 28.31 s；353,189 facts/s；峰值 RSS 50.23 MiB | 仅合成 CSV 生成，不是数据库吞吐 |
+| MySQL 导入与建索引 | 156.00 s；65,707 rows/s；六类答案全匹配 | 隔离 MySQL 8.0.26，含 25 万维表行 |
+| 单并发查询 P95 | DAU 11.30 ms；收入 293.79 ms；付费人数 3.61 ms；ARPU 19.41 ms；通过率 21.71 ms；渠道拆分 50.68 ms | 固定 SQL、预热后每类 30 次 |
+| 并发 20 查询 P95 | DAU 40.86 ms；收入 624.50 ms；付费人数 6.76 ms；ARPU 48.44 ms；通过率 33.92 ms；渠道拆分 120.11 ms | 每查询类型独立并发批次，不是混合线上流量 |
+
+四个并发档（1/5/10/20）共保留 720 个原始延迟样本、24 份结果一致性结论和 EXPLAIN 计划，全部 0 超时、0 执行错误。完整报告位于 `eval/results/ten_million_generation.json`、`ten_million_import.json` 和 `ten_million_db_benchmark.json`。
+
+复现时使用独立实验库账号；导入器只接受 `gamequery_scale_*`，并永久拒绝 `dw`、`mysql`、`meta` 等默认或系统库：
+
+```bash
+uv run python eval/generate_scale_data.py --preset 10m --seed 20260923 --output artifacts/scale/ten-million
+uv run python eval/validate_scale_data.py --dataset artifacts/scale/ten-million --full-scan
+
+export SCALE_DB_HOST=127.0.0.1 SCALE_DB_PORT=3306
+export SCALE_DB_USER=scale_writer SCALE_DB_PASSWORD='replace-me'
+uv run python eval/import_scale_data.py --dataset artifacts/scale/ten-million --database gamequery_scale_10m --batch-size 10000 --replace
+uv run python eval/run_db_scale_benchmark.py --dataset artifacts/scale/ten-million --database gamequery_scale_10m --concurrency 1,5,10,20 --iterations 30 --warmups 3
+```
+
+这些数字证明“本机 + 当前 Schema/索引 + 固定六类 SQL”能够处理千万事实行，不等于数据库容量上限、真实企业流量、端到端 Agent 延迟、LLM 准确率或业务提效。生产结论仍需在目标硬件、真实数据分布、混合工作负载和 SLA 下重新测量。
+
 ---
 
 ## 技术栈
@@ -279,7 +306,7 @@ gamequery-agent/
 │   └── repositories/       # MySQL、Qdrant、ES 数据访问
 ├── conf/                   # 应用、元数据与指标配置
 ├── docker/                 # MySQL、Qdrant、ES 等基础服务
-├── eval/                   # SQL/检索基准、规模生成器与 Locust 场景
+├── eval/                   # SQL/检索基准、10m 生成/导入/查询证据与 Locust 场景
 ├── frontend/               # React / TypeScript 查询界面
 ├── prompts/                # SQL 生成、过滤与修正提示词
 ├── tests/                  # 安全、纠错、语义层、API 与轨迹测试
@@ -294,13 +321,14 @@ gamequery-agent/
 - [最新评测结果](eval/latest_metrics.json)
 - [可靠性升级验收](specs/reliable-agent-upgrade/validation.md)
 - [升级后调用链导览](specs/reliable-agent-upgrade/walkthrough.md)
+- [千万级合成数据验收](specs/synthetic-business-scale/validation.md)
 
 ## 数据与评测边界
 
 - 游戏运营数据为仓库内构造的模拟数据，不包含真实企业或玩家数据。
 - 固定 SQL 基准不调用 LLM，因此不能用来宣称模型生成准确率。
 - 固定检索 fixture 不访问线上索引，因此不能用来宣称真实召回率。
-- 已提供 10 万/100 万数据生成和 Locust 工具，但尚未在目标硬件完成正式负载实验，不宣称千万级、QPS 或线上 P95。
+- 已完成本机千万事实行生成、隔离 MySQL 导入和固定 SQL 查询实测；只声明报告所记录的环境、规模与工作负载，不声明生产容量上限或线上 P95。
 - 生产效果需要在独立的自然语言问题集、真实 Schema 和受控权限环境中重新测量。
 
 ## 来源与许可证

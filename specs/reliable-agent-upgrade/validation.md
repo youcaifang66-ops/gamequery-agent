@@ -1,5 +1,7 @@
 # Validation: GameQuery 可靠性升级
 
+> 本文件是可靠性升级完成时的历史快照；其中“尚未运行规模实验”的陈述已由后续 `specs/synthetic-business-scale/validation.md` 补充，不应继续作为当前容量状态。
+
 验证基线：`5a79be4`（2026-09-24）。本文件只记录可复现证据，不把 fixture、smoke 或工具能力外推为线上效果。
 
 ## 验收结论
