@@ -20,6 +20,7 @@ from app.repositories.mysql.meta.meta_mysql_repository import MetaMySQLRepositor
 from app.repositories.qdrant.column_qdrant_repository import ColumnQdrantRepository
 from app.repositories.qdrant.metric_qdrant_repository import MetricQdrantRepository
 from app.security.sql_guard import SQLGuard
+from app.semantic.query_normalization import normalize_query
 
 SAFE_RUNTIME_ERRORS = {
     "RETRIEVAL_UNAVAILABLE": "检索服务暂时不可用，请稍后重试。",
@@ -168,7 +169,8 @@ class QueryService:
         last_sequence = 0
         try:
             await self.trace_store.start(request_id, digest)
-            state = DataAgentState(query=query)
+            # 数仓关卡 ID 固定为三位数；兼容用户常用的 LEVEL_05 简写。
+            state = DataAgentState(query=normalize_query(query))
             async with asyncio.timeout(app_config.query.request_timeout_seconds):
                 async for raw_chunk in graph.astream(
                     input=state,

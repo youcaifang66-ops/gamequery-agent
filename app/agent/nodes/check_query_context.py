@@ -17,6 +17,7 @@ METRIC_EXPRESSION = re.compile(
     re.IGNORECASE,
 )
 GENERIC_GAME_SCOPES = {"游戏", "各游戏", "所有游戏", "每个游戏", "全游戏"}
+LEVEL_ID_PATTERN = re.compile(r"(?i)\bLEVEL_\d{3}\b")
 
 
 def _specific_game_requested(query: str) -> bool:
@@ -25,8 +26,9 @@ def _specific_game_requested(query: str) -> bool:
         return False
     prefix = query[: match.start()]
     prefix = DATE_PATTERN.sub("", prefix)
+    prefix = LEVEL_ID_PATTERN.sub("", prefix)
     prefix = re.sub(r"^(?:请|请问|帮我|查询|统计|看一下|看下)+", "", prefix)
-    prefix = re.sub(r"[\s，,。:：]+", "", prefix)
+    prefix = re.sub(r"(?:与|和|及|、|关卡|[\s，,。:：])+", "", prefix)
     return bool(prefix) and prefix not in GENERIC_GAME_SCOPES
 
 

@@ -5,6 +5,9 @@ SQL 生成节点
 本节点只生成 SQL，不做校验和执行，后续会交给 validate_sql 和 run_sql 继续处理。
 """
 
+import re
+from pathlib import Path
+
 import yaml
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
@@ -16,6 +19,44 @@ from app.agent.sql_output import normalize_sql_output
 from app.agent.state import DataAgentState
 from app.core.log import logger
 from app.prompt.prompt_loader import load_prompt
+from app.semantic.metric_catalog import MetricCatalog
+
+METRIC_CATALOG = MetricCatalog.load(
+    Path(__file__).resolve().parents[3] / "conf" / "metrics.yaml"
+)
+LEVEL_ID_PATTERN = re.compile(r"(?i)\bLEVEL_\d{3}\b")
+
+
+def _enrich_metric_infos(query: str, metric_infos: list[dict]) -> list[dict]:
+    """把版本化指标公式合并进召回上下文，避免模型自行猜测口径。"""
+
+    definitions = {
+        item["name"]: item for item in METRIC_CATALOG.prompt_context(query)
+    }
+    return [
+        {**metric_info, **definitions.get(metric_info["name"], {})}
+        for metric_info in metric_infos
+    ]
+
+
+def _compile_governed_metric_sql(
+    query: str, metric_infos: list[dict]
+) -> str | None:
+    """为有固定口径的简单关卡查询生成确定性 SQL。"""
+
+    metric_names = {metric["name"] for metric in metric_infos}
+    level_ids = list(dict.fromkeys(match.upper() for match in LEVEL_ID_PATTERN.findall(query)))
+    if "LevelPassRate" not in metric_names or not level_ids:
+        return None
+
+    values = ", ".join(f"'{level_id}'" for level_id in level_ids)
+    return (
+        "SELECT level_id, "
+        "SUM(passed) / NULLIF(SUM(attempts), 0) AS LevelPassRate "
+        "FROM fact_level_event "
+        f"WHERE level_id IN ({values}) "
+        "GROUP BY level_id ORDER BY level_id"
+    )
 
 
 async def generate_sql(state: DataAgentState, runtime: Runtime[DataAgentContext]):
@@ -28,10 +69,16 @@ async def generate_sql(state: DataAgentState, runtime: Runtime[DataAgentContext]
     try:
         # 这些上下文都由前置节点准备完成，模型只在给定表 字段 指标口径范围内生成 SQL
         table_infos = state["table_infos"]
-        metric_infos = state["metric_infos"]
+        metric_infos = _enrich_metric_infos(state["query"], state["metric_infos"])
         date_info = state["date_info"]
         db_info = state["db_info"]
         query = state["query"]
+
+        governed_sql = _compile_governed_metric_sql(query, metric_infos)
+        if governed_sql is not None:
+            logger.info(f"指标层生成的SQL：{governed_sql}")
+            writer({"type": "progress", "step": step, "status": "success"})
+            return {"sql": governed_sql}
 
         prompt = PromptTemplate(
             template=load_prompt("generate_sql"),

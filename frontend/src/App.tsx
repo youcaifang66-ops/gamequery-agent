@@ -23,7 +23,7 @@ const examples = [
   "统计 2026 年 9 月 18 日各游戏的 DAU",
   "统计 2026 年 9 月各平台的活跃玩家数和在线时长",
   "查询 2026 年 9 月各游戏的总收入和付费人数",
-  "统计 LEVEL_05 与 LEVEL_07 的关卡通过率",
+  "统计 LEVEL_005 与 LEVEL_007 的关卡通过率",
 ];
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "Vite /api proxy";

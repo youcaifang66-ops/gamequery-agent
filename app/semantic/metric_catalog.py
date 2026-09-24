@@ -52,6 +52,7 @@ class MetricCatalog:
             {
                 "name": item.name,
                 "formula": item.formula,
+                "source_table": item.source_table,
                 "required_tables": item.required_tables,
                 "time_column": item.time_column,
                 "grain": item.grain,

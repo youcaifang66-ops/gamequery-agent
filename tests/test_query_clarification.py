@@ -87,3 +87,12 @@ def test_recognized_named_game_continues():
     )
 
     assert result == {"clarification": None}
+
+
+def test_level_ids_are_not_misclassified_as_unknown_games():
+    result, _ = run_check(
+        "统计 LEVEL_005 与 LEVEL_007 的关卡通过率",
+        [metric("LevelPassRate")],
+    )
+
+    assert result == {"clarification": None}
