@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "status": "measured",
+  "dataset": {
+    "version": "1.0",
+    "seed": 20260923,
+    "fact_rows": 10000000,
+    "manifest_sha256": "b8cf43c1adf4636cef3a5e111dc92e3bb31b70af73875aff851230f6a112a615"
+  },
+  "environment": {
+    "git_sha": "7c8b9261786a4602e40a8acee206adc1e1fbc627",
+    "timestamp": "2026-09-24T06:23:08.858586+00:00",
+    "os": "Windows-11-10.0.26200-SP0",
+    "cpu": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+    "memory_bytes": 16844877824,
+    "python_version": "3.12.14"
+  },
+  "metrics": {
+    "elapsed_seconds": 28.31342,
+    "peak_rss_bytes": 52670464,
+    "output_bytes": 473341644,
+    "rows_per_second": 353189.408,
+    "distribution_checks": {
+      "long_tail_top_game_share": 0.391879,
+      "weekend_activity_lift": 1.298787,
+      "campaign_activity_lift": 2.986648,
+      "payment_mean": 16.2920515,
+      "payment_median": 3.0,
+      "level_passed_rows": 1361579,
+      "level_failed_rows": 638421
+    },
+    "ground_truth_case_count": 6
+  },
+  "validation": {
+    "mode": "independent_full_scan",
+    "checksums": true,
+    "row_counts": true,
+    "foreign_keys": true,
+    "distribution": true,
+    "ground_truth": true
+  },
+  "failure": null,
+  "scope": {
+    "synthetic": true,
+    "extrapolated": false,
+    "max_claimed_rows": 10000000
+  }
+}
