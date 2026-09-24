@@ -4,7 +4,7 @@
 
 **把自然语言运营问题转换为可追踪、可修正、受安全策略约束的 SQL**
 
-12 节点 DAG · 指标语义层 · 多路召回 · SQL AST 护栏 · 有限纠错 · 轨迹回放 · SSE
+14 节点 DAG · 指标语义层 · 混合检索 · SQL AST 护栏 · 有限纠错 · 轨迹回放 · SSE
 
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
@@ -38,7 +38,7 @@ GameQuery 面向游戏运营分析，将日活、在线时长、收入、付费�
 flowchart TB
     U[运营人员] --> UI[React / TypeScript]
     UI --> API[FastAPI + SSE]
-    API --> G[LangGraph 12 节点 DAG]
+    API --> G[LangGraph 14 节点 DAG]
 
     subgraph 多路召回
         G --> K[关键词抽取]
@@ -111,18 +111,20 @@ sequenceDiagram
 | ARPU | 收入 / 活跃玩家数 | 日 | 支付表 + 日活表 |
 | LevelPassRate | 通关次数 / 尝试次数 | 关卡 | `fact_level_event` |
 
-### 2. 12 节点 Agent 编排
+### 2. 14 节点 Agent 编排
 
 ```text
 关键词抽取
   ├─ 字段召回 ─┐
   ├─ 指标召回 ─┼─ 信息合并 ─┬─ 表过滤 ─┐
   └─ 字段值召回 ┘           └─ 指标过滤 ─┤
-                                      SQL 生成
+                                  信息完整性检查
+                                  ├─ 不完整 → 澄清
+                                  └─ 完整 → SQL 生成
                                          ↓
                                   校验 ⇄ 有限修正
                                          ↓
-                                       执行
+                                  执行或结构化失败
 ```
 
 图状态只保存可序列化业务数据；MySQL、Qdrant、Elasticsearch 和 Embedding 客户端通过 Runtime Context 注入，便于测试与替换。
@@ -131,8 +133,8 @@ sequenceDiagram
 
 | 通道 | 召回内容 | 作用 |
 |---|---|---|
-| Qdrant 字段通道 | 表名、字段名和字段描述 | 找到可能参与 SQL 的 Schema |
-| Qdrant 指标通道 | 指标名称、别名与公式 | 绑定统一业务口径 |
+| Qdrant 字段通道 | dense、BM25、exact/alias、扩词排名 | 找到可能参与 SQL 的 Schema |
+| Qdrant 指标通道 | dense、BM25、exact/alias、扩词排名 | 绑定统一业务口径 |
 | Elasticsearch 值通道 | 游戏名、渠道等精确值 | 提升实体值匹配能力 |
 | 加权 RRF | 多通道候选与来源证据 | 统一不同通道的分数量纲 |
 
@@ -187,7 +189,9 @@ erDiagram
 | 候选 SQL 首轮通过 | 12 / 16（75%） | 16 条可执行目标中无需修正的比例 |
 | 预设错误 SQL 修正后执行 | 4 / 4 | 固定错误与对应修正 SQL |
 | 越权 SQL 拦截 | 4 / 4 | 删除、系统表、未知字段、多语句 |
-| AST 护栏 P95 | 0.424 ms | 本次本地重复执行，不含 LLM 与网络耗时，随机器环境波动 |
+| AST 护栏 P95 | 1.724 ms | 最新 fixture 报告，不含 LLM 与网络耗时，随机器环境波动 |
+
+`eval/retrieval_benchmark.json` 另有 32 条字段、指标、字段值和 no-match fixture。当前融合 Hit@5/MRR 为 1.0，no-match false-positive rate 为 0.2；这是固定候选排序上的评测器与融合回归结果，不是线上 Qdrant 检索质量。
 
 > 该基准验证 SQL 护栏、有限纠错和执行组件，不代表 LLM 端到端 Text-to-SQL 准确率，也不代表真实企业数据规模下的性能。
 
@@ -197,6 +201,7 @@ erDiagram
 uv sync --frozen --group dev
 uv run pytest -q
 uv run python eval/run_sql_eval.py
+uv run python eval/run_retrieval_eval.py --mode fixture
 ```
 
 ---
@@ -207,7 +212,7 @@ uv run python eval/run_sql_eval.py
 |---|---|---|
 | 前端 | React / TypeScript / Vite | 查询输入、步骤轨迹与结果表格 |
 | API | FastAPI / SSE | 查询入口、请求 ID 与流式响应 |
-| Agent 编排 | LangGraph | 12 节点 DAG、条件跳转与有限纠错 |
+| Agent 编排 | LangGraph | 14 节点 DAG、显式汇合、澄清与有限纠错 |
 | 检索 | Qdrant / Elasticsearch / RRF | Schema、指标和字段值多路召回 |
 | SQL 安全 | SQLGlot / MySQL EXPLAIN | AST 策略检查与真实方言校验 |
 | 状态与审计 | SQLite | 执行轨迹持久化与回放 |
@@ -274,7 +279,7 @@ gamequery-agent/
 │   └── repositories/       # MySQL、Qdrant、ES 数据访问
 ├── conf/                   # 应用、元数据与指标配置
 ├── docker/                 # MySQL、Qdrant、ES 等基础服务
-├── eval/                   # 20 条组件回归基准与评测脚本
+├── eval/                   # SQL/检索基准、规模生成器与 Locust 场景
 ├── frontend/               # React / TypeScript 查询界面
 ├── prompts/                # SQL 生成、过滤与修正提示词
 ├── tests/                  # 安全、纠错、语义层、API 与轨迹测试
@@ -287,11 +292,15 @@ gamequery-agent/
 - [十阶段迭代路线](docs/ROADMAP.md)
 - [面试深挖与责任边界](docs/INTERVIEW.md)
 - [最新评测结果](eval/latest_metrics.json)
+- [可靠性升级验收](specs/reliable-agent-upgrade/validation.md)
+- [升级后调用链导览](specs/reliable-agent-upgrade/walkthrough.md)
 
 ## 数据与评测边界
 
 - 游戏运营数据为仓库内构造的模拟数据，不包含真实企业或玩家数据。
 - 固定 SQL 基准不调用 LLM，因此不能用来宣称模型生成准确率。
+- 固定检索 fixture 不访问线上索引，因此不能用来宣称真实召回率。
+- 已提供 10 万/100 万数据生成和 Locust 工具，但尚未在目标硬件完成正式负载实验，不宣称千万级、QPS 或线上 P95。
 - 生产效果需要在独立的自然语言问题集、真实 Schema 和受控权限环境中重新测量。
 
 ## 来源与许可证
