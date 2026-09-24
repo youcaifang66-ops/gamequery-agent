@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "status": "measured",
+  "dataset": {
+    "version": "1.0",
+    "seed": 20260923,
+    "fact_rows": 10000000,
+    "manifest_sha256": "b8cf43c1adf4636cef3a5e111dc92e3bb31b70af73875aff851230f6a112a615"
+  },
+  "environment": {
+    "git_sha": "2beba2bc3c3afc350649422ccd5c6fe153ca575c",
+    "timestamp": "2026-09-24T07:18:17.352144+00:00",
+    "os": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.12.14",
+    "mysql_version": "8.0.26",
+    "database": "gamequery_scale_10m"
+  },
+  "metrics": {
+    "tables": {
+      "dim_player": {
+        "expected_rows": 250000,
+        "imported_rows": 250000,
+        "elapsed_seconds": 2.329815
+      },
+      "dim_game": {
+        "expected_rows": 20,
+        "imported_rows": 20,
+        "elapsed_seconds": 0.003394
+      },
+      "dim_date": {
+        "expected_rows": 365,
+        "imported_rows": 365,
+        "elapsed_seconds": 0.004153
+      },
+      "fact_player_daily": {
+        "expected_rows": 6000000,
+        "imported_rows": 6000000,
+        "elapsed_seconds": 65.702663
+      },
+      "fact_payment": {
+        "expected_rows": 2000000,
+        "imported_rows": 2000000,
+        "elapsed_seconds": 20.758989
+      },
+      "fact_level_event": {
+        "expected_rows": 2000000,
+        "imported_rows": 2000000,
+        "elapsed_seconds": 24.017394
+      }
+    },
+    "index_elapsed_seconds": 41.84197,
+    "total_elapsed_seconds": 156.00113,
+    "throughput_rows_per_second": 65707.12,
+    "ground_truth_passed": true
+  },
+  "failure": null,
+  "scope": {
+    "synthetic": true,
+    "extrapolated": false,
+    "max_claimed_rows": 10000000
+  }
+}
+
