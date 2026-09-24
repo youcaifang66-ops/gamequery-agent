@@ -139,11 +139,26 @@ def test_cancellation_marks_trace_cancelled_and_reraises(monkeypatch, tmp_path):
         with pytest.raises(asyncio.CancelledError):
             await task
         replay = await store.replay("request-cancelled")
-        await store.close()
-        return replay
 
-    replay = asyncio.run(scenario())
+        class ReusableGraph:
+            async def astream(self, **kwargs):
+                yield {"type": "result", "data": [{"value": 1}]}
+
+        monkeypatch.setattr(query_service_module, "graph", ReusableGraph())
+        next_messages = [
+            parse_sse(message)
+            async for message in make_service(store).query(
+                "查询收入", request_id="request-after-cancel"
+            )
+        ]
+        next_replay = await store.replay("request-after-cancel")
+        await store.close()
+        return replay, next_messages, next_replay
+
+    replay, next_messages, next_replay = asyncio.run(scenario())
     assert replay["status"] == "cancelled"
+    assert [event["type"] for event in next_messages] == ["result", "done"]
+    assert next_replay["status"] == "completed"
 
 
 def test_closing_stream_after_partial_delivery_marks_cancelled(monkeypatch, tmp_path):

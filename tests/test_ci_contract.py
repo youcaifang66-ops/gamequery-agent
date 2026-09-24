@@ -16,6 +16,7 @@ def test_ci_contains_every_offline_reliability_gate():
         "uv sync --frozen --group dev",
         "uv run ruff check app tests eval main.py",
         "uv run pytest -q",
+        "Initialize least-privilege MySQL fixtures",
         "run_sql_eval",
         "run_retrieval_eval",
         "generate_scale_data.py --preset smoke",
@@ -49,3 +50,4 @@ def test_ci_yaml_has_backend_and_frontend_jobs_with_read_only_permissions():
     assert set(workflow["jobs"]) == {"backend", "frontend"}
     assert workflow["jobs"]["backend"]["runs-on"] == "ubuntu-latest"
     assert workflow["jobs"]["frontend"]["runs-on"] == "ubuntu-latest"
+    assert set(workflow["jobs"]["backend"]["services"]) == {"mysql", "qdrant"}

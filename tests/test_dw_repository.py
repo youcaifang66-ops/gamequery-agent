@@ -63,6 +63,21 @@ def test_validate_timeout_rolls_back_session():
     assert session.rollback_calls == 1
 
 
+def test_session_can_be_reused_after_validation_timeout():
+    async def scenario():
+        session = FakeSession(delay=0.02)
+        repository = DWMySQLRepository(session)
+        with pytest.raises(TimeoutError):
+            await repository.validate("SELECT 1", timeout_ms=1)
+        session.delay = 0
+        await repository.validate("SELECT 2", timeout_ms=5_000)
+        return session
+
+    session = asyncio.run(scenario())
+    assert session.rollback_calls == 1
+    assert session.executed == ["EXPLAIN SELECT 1", "EXPLAIN SELECT 2"]
+
+
 def test_run_uses_exact_sql_and_defensively_bounds_fetched_rows():
     session = FakeSession(rows=[{"id": 1}, {"id": 2}, {"id": 3}])
     repository = DWMySQLRepository(session)
