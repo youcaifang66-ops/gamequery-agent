@@ -4,6 +4,7 @@ import pytest
 
 from eval.generate_scale_data import generate
 from eval.import_scale_data import (
+    ANALYZE_TABLES,
     ScaleImportError,
     import_dataset,
     iter_csv_batches,
@@ -38,6 +39,17 @@ def test_csv_batches_are_bounded_and_preserve_rows(tmp_path):
     assert max(map(len, batches)) == 17
     assert sum(map(len, batches)) == 60
     assert len(batches[-1]) <= 17
+
+
+def test_importer_refreshes_optimizer_statistics_for_every_table():
+    assert set(ANALYZE_TABLES) == {
+        "dim_player",
+        "dim_game",
+        "dim_date",
+        "fact_player_daily",
+        "fact_payment",
+        "fact_level_event",
+    }
 
 
 def test_invalid_dataset_fails_before_database_connection(tmp_path):
