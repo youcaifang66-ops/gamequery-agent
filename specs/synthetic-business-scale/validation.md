@@ -7,7 +7,7 @@
 - 实际生成并独立全扫描 10,000,000 条事实记录，未做线性外推。
 - 实际导入隔离的 MySQL 8.0.26 实验库；三张事实表共 10,000,000 行，三张维表共 250,385 行，六类 SQL 结果与标准答案完全一致。
 - 实际运行并发 1/5/10/20，每档 6 类查询、每类 30 个计时样本，共 720 个原始样本；24 个组合全部结果匹配、0 超时、0执行错误，并保留 EXPLAIN。
-- 本地 Python 全量回归在文档更新前为 138 passed、3 skipped；新增证据合同测试另有 3 passed。最终门禁结果见本文件末尾审计记录。
+- 最终本地门禁为 Ruff 全绿、141 passed / 3 个显式外部服务 skip、新增 6 个规模模块 mypy 全绿；前端 TypeScript 检查与 Vite production build 通过。
 - 大型 CSV 和隔离数据库文件未进入 Git；仓库只保存生成、导入和查询的 JSON 证据。
 
 ## 实验环境
@@ -67,7 +67,7 @@
 | AC-10 C=1 基准 | 通过 | 六类各 30 样本、p50/p95/p99/max、plan |
 | AC-11 1/5/10/20 阶梯 | 通过 | `ten_million_db_benchmark.json` 4 档、720 原始样本 |
 | AC-12 真实性 | 通过 | `measured`、`extrapolated=false`、scope=10m；失败报告合同测试 |
-| AC-13 CI smoke | 通过（接线） | `.github/workflows/ci.yml` 与 `tests/integration/test_scale_pipeline.py`；CI 只跑 1k |
+| AC-13 CI smoke | 通过 | `.github/workflows/ci.yml` 与 `tests/integration/test_scale_pipeline.py`；CI 只跑 1k；[Actions #35969589667](https://github.com/youcaifang66-ops/gamequery-agent/actions/runs/35969589667) 全绿 |
 | AC-14 Agent 兼容 | 通过 | 全量 pytest 和 Ruff；在线 Agent 文件未修改 |
 | AC-15 大文件治理 | 通过 | `/artifacts/scale/` 被忽略；`git ls-files artifacts/scale` 为空 |
 | AC-E1 输入失败 | 通过 | 根目录、非正行数、非空输出目录测试 |
@@ -87,3 +87,16 @@
 ## 结论边界
 
 已证明的是：这台机器上的当前 Schema、四个组合索引和六类固定 SQL，能够在 1000 万合成事实行上完成正确导入和查询。没有证明真实企业数据分布、LLM Text-to-SQL 正确率、端到端 Agent P95、线上混合流量容量、业务提效或更大数据量；这些仍需在目标环境重新测量。
+
+## 最终门禁
+
+```text
+uv run ruff check app tests eval main.py                                  PASS
+uv run pytest -q                                                         141 passed, 3 skipped
+uvx mypy --ignore-missing-imports --explicit-package-bases <6 scale files> PASS
+pnpm build                                                               PASS
+RUN_SCALE_INTEGRATION=1 pytest tests/integration/test_scale_pipeline.py   1 passed
+GitHub Actions reliability-ci #35969589667                               PASS
+```
+
+三个本地 skip 分别依赖由 CI 提供的真实服务；同一提交的 GitHub Actions 已运行 MySQL/Qdrant 服务测试和 1k 规模管道，因此不是把未执行的集成测试计为通过。
