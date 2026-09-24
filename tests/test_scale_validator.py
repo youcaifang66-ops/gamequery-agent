@@ -13,7 +13,9 @@ def _refresh_manifest_file(dataset, filename):
     manifest_path = dataset / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest["files"][filename]["bytes"] = path.stat().st_size
-    manifest["files"][filename]["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+    manifest["files"][filename]["sha256"] = hashlib.sha256(
+        path.read_bytes()
+    ).hexdigest()
     manifest_path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
