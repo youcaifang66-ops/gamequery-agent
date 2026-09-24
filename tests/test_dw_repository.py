@@ -1,4 +1,6 @@
 import asyncio
+from datetime import date, datetime, time
+from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
@@ -22,6 +24,9 @@ class FakeResult:
     def mappings(self):
         return FakeMappings(self.rows)
 
+    def fetchall(self):
+        return self.rows
+
 
 class FakeSession:
     def __init__(self, rows=(), delay=0):
@@ -40,6 +45,27 @@ class FakeSession:
 
     async def rollback(self):
         self.rollback_calls += 1
+
+
+def test_column_examples_are_json_safe_for_real_mysql_scalar_types():
+    values = [
+        (date(2026, 9, 18),),
+        (datetime(2026, 9, 18, 12, 30, 5),),
+        (time(12, 30, 5),),
+        (Decimal("68.00"),),
+        (b"CNY",),
+    ]
+    repository = DWMySQLRepository(FakeSession(rows=values))
+
+    result = asyncio.run(repository.get_column_values("fact_payment", "amount"))
+
+    assert result == [
+        "2026-09-18",
+        "2026-09-18T12:30:05",
+        "12:30:05",
+        "68.00",
+        "CNY",
+    ]
 
 
 def test_validate_explains_the_exact_guarded_sql():

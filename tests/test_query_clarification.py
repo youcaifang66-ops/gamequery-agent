@@ -65,6 +65,14 @@ def test_complete_date_and_scope_continues_without_clarification():
     }
 
 
+def test_date_with_display_spacing_continues_without_clarification():
+    result, _ = run_check(
+        "统计 2026 年 9 月 18 日各游戏的 DAU", [metric("DAU")]
+    )
+
+    assert result == {"clarification": None}
+
+
 def test_recognized_named_game_continues():
     result, _ = run_check(
         "查询2026年9月18日星海远征的收入",

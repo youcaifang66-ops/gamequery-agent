@@ -7,7 +7,7 @@ from app.agent.state import ClarificationState, DataAgentState
 
 DATE_REQUIRED_METRICS = {"DAU"}
 DATE_PATTERN = re.compile(
-    r"(?:\d{4}[年/-]\d{1,2}(?:[月/-]\d{1,2}日?)?|"
+    r"(?:\d{4}\s*[年/-]\s*\d{1,2}(?:\s*[月/-]\s*\d{1,2}\s*日?)?|"
     r"今天|今日|昨天|昨日|前天|本周|上周|本月|上月|本季度|上季度|"
     r"今年|去年|最近\s*\d+\s*[天周月年])"
 )

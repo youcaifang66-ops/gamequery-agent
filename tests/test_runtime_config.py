@@ -23,6 +23,7 @@ def test_runtime_config_has_bounded_query_and_trace_settings(monkeypatch):
     monkeypatch.setenv("LLM_API_KEY", "test-key")
     monkeypatch.setenv("META_DB_PASSWORD", "test-meta-password")
     monkeypatch.setenv("DW_DB_PASSWORD", "test-dw-password")
+    monkeypatch.setenv("QUERY_REQUEST_TIMEOUT_SECONDS", "60")
     sys.modules.pop("app.conf.app_config", None)
 
     config_module = importlib.import_module("app.conf.app_config")

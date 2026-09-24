@@ -8,6 +8,9 @@ SQL 生成闭环中的数据库环境读取 SQL 校验和最终查询执行也�
 """
 
 import asyncio
+from datetime import date, datetime, time
+from decimal import Decimal
+from typing import Any
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,6 +21,17 @@ class DWMySQLRepository:
 
     def __init__(self, session: AsyncSession):
         self.session = session
+
+    @staticmethod
+    def _json_safe_value(value: Any) -> Any:
+        """把 MySQL 标量转换为可写入 JSON、Qdrant 和 ES 的稳定表示。"""
+        if isinstance(value, (date, datetime, time)):
+            return value.isoformat()
+        if isinstance(value, Decimal):
+            return str(value)
+        if isinstance(value, bytes):
+            return value.decode("utf-8", errors="replace")
+        return value
 
     async def get_column_types(self, table_name: str) -> dict[str, str]:
         """查询整张表的字段类型，作为 ColumnInfo.type 的真实来源"""
@@ -32,7 +46,7 @@ class DWMySQLRepository:
         """抽样查询字段示例值，供元数据入库和后续检索链路复用"""
         sql = f"select distinct {column_name} from {table_name} limit {limit}"
         result = await self.session.execute(text(sql))
-        return [row[0] for row in result.fetchall()]
+        return [self._json_safe_value(row[0]) for row in result.fetchall()]
 
     async def get_db_info(self):
         """读取当前数仓数据库的方言和版本，供 SQL 生成提示词使用"""

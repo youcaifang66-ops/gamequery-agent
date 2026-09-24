@@ -49,8 +49,8 @@ sql_policy:
   statement_timeout_ms: 5000
 
 query:
-  request_timeout_seconds: 60
-  max_correction_attempts: 2
+  request_timeout_seconds: ${oc.env:QUERY_REQUEST_TIMEOUT_SECONDS,60}
+  max_correction_attempts: ${oc.env:QUERY_MAX_CORRECTION_ATTEMPTS,2}
 
 trace:
   database_path: ${oc.env:TRACE_DATABASE_PATH,data/traces.sqlite3}

@@ -30,6 +30,7 @@ def test_ollama_async_embedding_contract(monkeypatch):
 
     class FakeAsyncClient(httpx.AsyncClient):
         def __init__(self, *args, **kwargs):
+            assert kwargs["trust_env"] is False
             super().__init__(transport=transport)
 
     monkeypatch.setattr(httpx, "AsyncClient", FakeAsyncClient)

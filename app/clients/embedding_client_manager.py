@@ -30,11 +30,11 @@ class OllamaEmbeddings(Embeddings):
         return embeddings
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
-        response = httpx.post(
-            f"{self.base_url}/api/embed",
-            json={"model": self.model, "input": texts},
-            timeout=120,
-        )
+        with httpx.Client(timeout=120, trust_env=False) as client:
+            response = client.post(
+                f"{self.base_url}/api/embed",
+                json={"model": self.model, "input": texts},
+            )
         response.raise_for_status()
         return self._parse(response.json())
 
@@ -42,7 +42,7 @@ class OllamaEmbeddings(Embeddings):
         return self.embed_documents([text])[0]
 
     async def aembed_documents(self, texts: list[str]) -> list[list[float]]:
-        async with httpx.AsyncClient(timeout=120) as client:
+        async with httpx.AsyncClient(timeout=120, trust_env=False) as client:
             response = await client.post(
                 f"{self.base_url}/api/embed",
                 json={"model": self.model, "input": texts},

@@ -12,6 +12,7 @@ from langgraph.runtime import Runtime
 
 from app.agent.context import DataAgentContext
 from app.agent.llm import llm
+from app.agent.sql_output import normalize_sql_output
 from app.agent.state import DataAgentState
 from app.core.log import logger
 from app.prompt.prompt_loader import load_prompt
@@ -69,6 +70,7 @@ async def correct_sql(state: DataAgentState, runtime: Runtime[DataAgentContext])
             }
         )
 
+        result = normalize_sql_output(result)
         logger.info(f"校正后的SQL：{result}")
         writer({"type": "progress", "step": step, "status": "success"})
         return {"sql": result, "correction_attempts": state.get("correction_attempts", 0) + 1}

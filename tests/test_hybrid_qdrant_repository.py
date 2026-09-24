@@ -147,4 +147,6 @@ def test_client_passes_documents_to_self_hosted_server_inference(monkeypatch):
     assert captured == {
         "url": "http://qdrant:6333",
         "cloud_inference": True,
+        "trust_env": False,
+        "check_compatibility": False,
     }

@@ -17,6 +17,30 @@ from app.core.log import logger
 from app.prompt.prompt_loader import load_prompt
 
 
+def apply_table_selection(
+    table_infos: list[TableInfoState],
+    result: dict[str, list[str]],
+    required_table_names: set[str] | None = None,
+) -> list[TableInfoState]:
+    """应用模型选择；无效输出时优先退回指标明确依赖的事实表。"""
+    filtered_table_infos: list[TableInfoState] = []
+    for table_info in table_infos:
+        selected_columns = result.get(table_info["name"])
+        if selected_columns:
+            table_info["columns"] = [
+                column_info
+                for column_info in table_info["columns"]
+                if column_info["name"] in selected_columns
+            ]
+            if table_info["columns"]:
+                filtered_table_infos.append(table_info)
+    if filtered_table_infos:
+        return filtered_table_infos
+    required = required_table_names or set()
+    metric_tables = [table for table in table_infos if table["name"] in required]
+    return metric_tables or table_infos
+
+
 async def filter_table(state: DataAgentState, runtime: Runtime[DataAgentContext]):
     """根据用户问题裁剪候选表结构上下文"""
 
@@ -47,15 +71,14 @@ async def filter_table(state: DataAgentState, runtime: Runtime[DataAgentContext]
             }
         )
         # 模型只负责选择，程序根据选择结果从原始 TableInfoState 中裁剪，避免模型重写复杂结构出错
-        filtered_table_infos: list[TableInfoState] = []
-        for table_info in table_infos:
-            if table_info["name"] in result:
-                table_info["columns"] = [
-                    column_info
-                    for column_info in table_info["columns"]
-                    if column_info["name"] in result[table_info["name"]]
-                ]
-                filtered_table_infos.append(table_info)
+        required_table_names = {
+            column_id.split(".", 1)[0]
+            for metric_info in state["metric_infos"]
+            for column_id in metric_info["relevant_columns"]
+        }
+        filtered_table_infos = apply_table_selection(
+            table_infos, result, required_table_names
+        )
 
         logger.info(
             f"过滤后的表信息：{[filtered_table_info['name'] for filtered_table_info in filtered_table_infos]}"

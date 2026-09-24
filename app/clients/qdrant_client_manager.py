@@ -37,6 +37,9 @@ class QdrantClientManager:
         self.client = AsyncQdrantClient(
             url=self._get_url(),
             cloud_inference=True,
+            # 避免 Windows 的环境代理错误接管 localhost 请求并返回 502。
+            trust_env=False,
+            check_compatibility=False,
         )
 
     async def close(self):
