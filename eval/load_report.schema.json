@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GameQuery measured load report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["metadata", "metrics", "scope"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_sha", "timestamp", "os", "cpu", "memory", "python_version", "mysql_version", "qdrant_version", "row_count", "index_description", "concurrency", "spawn_rate", "duration_seconds", "warmup_seconds"],
+      "properties": {
+        "git_sha": {"type": "string"}, "timestamp": {"type": "string"},
+        "os": {"type": "string"}, "cpu": {"type": "string"}, "memory": {"type": "string"},
+        "python_version": {"type": "string"}, "mysql_version": {"type": "string"}, "qdrant_version": {"type": "string"},
+        "row_count": {"type": "integer", "minimum": 1}, "index_description": {"type": "string"},
+        "concurrency": {"type": "integer", "minimum": 1}, "spawn_rate": {"type": "number", "exclusiveMinimum": 0},
+        "duration_seconds": {"type": "number", "exclusiveMinimum": 0}, "warmup_seconds": {"type": "number", "minimum": 0}
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_count", "success_rate", "throughput_rps", "p50_ms", "p95_ms", "p99_ms", "timeout_rate", "error_code_counts", "slowest_query_names"],
+      "properties": {
+        "request_count": {"type": "integer", "minimum": 0}, "success_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "throughput_rps": {"type": "number", "minimum": 0}, "p50_ms": {"type": "number", "minimum": 0},
+        "p95_ms": {"type": "number", "minimum": 0}, "p99_ms": {"type": "number", "minimum": 0},
+        "timeout_rate": {"type": "number", "minimum": 0, "maximum": 1}, "error_code_counts": {"type": "object"},
+        "slowest_query_names": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "scope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["extrapolated", "max_claimed_rows", "statement"],
+      "properties": {
+        "extrapolated": {"const": false}, "max_claimed_rows": {"type": "integer", "minimum": 1},
+        "statement": {"const": "Results apply only to the recorded row_count."}
+      }
+    }
+  }
+}
