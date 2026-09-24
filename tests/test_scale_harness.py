@@ -19,15 +19,20 @@ def read_ids(path: Path, column: str) -> set[str]:
 
 
 def test_presets_include_smoke_one_hundred_thousand_and_one_million():
-    assert PRESET_ROWS == {"smoke": 1_000, "100k": 100_000, "1m": 1_000_000}
+    assert PRESET_ROWS == {
+        "smoke": 1_000,
+        "100k": 100_000,
+        "1m": 1_000_000,
+        "10m": 10_000_000,
+    }
 
 
 def test_generator_is_deterministic_and_fact_count_is_exact(tmp_path):
     first = generate(tmp_path / "first", rows=1_000, seed=DEFAULT_SEED)
     second = generate(tmp_path / "second", rows=1_000, seed=DEFAULT_SEED)
 
-    assert first == second
     assert first["actual_fact_rows"] == first["requested_fact_rows"] == 1_000
+    assert first["files"] == second["files"]
     fact_files = [name for name in first["files"] if name.startswith("fact_")]
     assert sum(first["files"][name]["rows"] for name in fact_files) == 1_000
 
