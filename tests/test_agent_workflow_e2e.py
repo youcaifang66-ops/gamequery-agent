@@ -79,6 +79,10 @@ def workflow_nodes(*, outcomes, repository, retrieval_failure=False, slow=False)
         sql_versions.append("candidate-v1")
         return {"sql": "candidate-v1", "correction_attempts": 0}
 
+    async def check_query_context(state):
+        visited.append("check_query_context")
+        return {"clarification": None}
+
     async def validate_sql(state):
         visited.append("validate_sql")
         outcome = pending.pop(0) if pending else outcomes[-1]
@@ -133,6 +137,7 @@ def workflow_nodes(*, outcomes, repository, retrieval_failure=False, slow=False)
         "filter_table": filter_table,
         "filter_metric": filter_metric,
         "add_extra_context": add_extra_context,
+        "check_query_context": check_query_context,
         "generate_sql": generate_sql,
         "validate_sql": validate_sql,
         "correct_sql": correct_sql,

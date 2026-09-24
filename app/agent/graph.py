@@ -16,6 +16,7 @@ from langgraph.graph import StateGraph
 
 from app.agent.context import DataAgentContext
 from app.agent.nodes.add_extra_context import add_extra_context
+from app.agent.nodes.check_query_context import check_query_context
 from app.agent.nodes.correct_sql import correct_sql
 from app.agent.nodes.extract_keywords import extract_keywords
 from app.agent.nodes.fail_sql import fail_sql
@@ -52,6 +53,7 @@ DEFAULT_NODES: dict[str, Callable[..., Any]] = {
     "filter_metric": filter_metric,
     "filter_table": filter_table,
     "add_extra_context": add_extra_context,
+    "check_query_context": check_query_context,
     "generate_sql": generate_sql,
     "validate_sql": validate_sql,
     "correct_sql": correct_sql,
@@ -103,7 +105,12 @@ def build_graph(
         ["filter_table", "filter_metric"],
         "add_extra_context",
     )
-    graph_builder.add_edge("add_extra_context", "generate_sql")
+    graph_builder.add_edge("add_extra_context", "check_query_context")
+    graph_builder.add_conditional_edges(
+        source="check_query_context",
+        path=lambda state: "clarify" if state.get("clarification") else "continue",
+        path_map={"clarify": END, "continue": "generate_sql"},
+    )
     graph_builder.add_edge("generate_sql", "validate_sql")
     graph_builder.add_conditional_edges(
         source="validate_sql",

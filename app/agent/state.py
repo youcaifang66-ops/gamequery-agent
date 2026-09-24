@@ -78,6 +78,12 @@ class RetrievalEvidenceState(TypedDict):
     evidence: list[dict]
 
 
+class ClarificationState(TypedDict):
+    code: str
+    missing_slots: list[str]
+    message: str
+
+
 class DataAgentState(TypedDict):
     """一次问数链路中的核心状态"""
 
@@ -88,6 +94,7 @@ class DataAgentState(TypedDict):
     retrieved_value_infos: list[ValueInfo]  # 检索到的取值信息
     column_retrieval_evidence: list[RetrievalEvidenceState]
     metric_retrieval_evidence: list[RetrievalEvidenceState]
+    clarification: ClarificationState | None
 
     table_infos: list[TableInfoState]  # 合并和补齐后的表结构上下文
     metric_infos: list[MetricInfoState]  # 合并后的指标上下文

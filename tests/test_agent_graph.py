@@ -54,6 +54,10 @@ def node_set(*, validation_results):
             "db_info": {"dialect": "mysql", "version": "8.0"},
         }
 
+    async def check_query_context(state):
+        calls.append("check_query_context")
+        return {"clarification": None}
+
     async def generate_sql(state):
         calls.append("generate_sql")
         return {"sql": "candidate", "correction_attempts": 0}
@@ -103,6 +107,7 @@ def node_set(*, validation_results):
         "filter_table": filter_table,
         "filter_metric": filter_metric,
         "add_extra_context": add_extra_context,
+        "check_query_context": check_query_context,
         "generate_sql": generate_sql,
         "validate_sql": validate_sql,
         "correct_sql": correct_sql,
@@ -171,3 +176,35 @@ def test_one_repair_then_success_reaches_runner_once():
 def test_unknown_node_override_is_rejected_at_construction():
     with pytest.raises(ValueError, match="unknown node overrides"):
         build_graph({"not_a_node": lambda state: {}})
+
+
+def test_clarification_ends_before_sql_generation():
+    calls, nodes = node_set(validation_results=["success"])
+
+    async def clarify(state, runtime):
+        calls.append("check_query_context")
+        clarification = {
+            "code": "MISSING_DATE",
+            "missing_slots": ["date"],
+            "message": "请提供日期。",
+        }
+        runtime.stream_writer({"type": "clarification", **clarification})
+        return {"clarification": clarification}
+
+    nodes["check_query_context"] = clarify
+    graph = build_graph(nodes)
+
+    async def collect():
+        return [
+            chunk
+            async for chunk in graph.astream(
+                {"query": "查询各游戏DAU"}, stream_mode="custom"
+            )
+        ]
+
+    events = asyncio.run(collect())
+
+    assert any(event["type"] == "clarification" for event in events)
+    assert "generate_sql" not in calls
+    assert "validate_sql" not in calls
+    assert "run_sql" not in calls
