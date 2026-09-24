@@ -8,16 +8,57 @@ Embedding 客户端管理器
 import asyncio
 from typing import Optional
 
+import httpx
+from langchain_core.embeddings import Embeddings
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
 
 from app.conf.app_config import EmbeddingConfig, app_config
+
+
+class OllamaEmbeddings(Embeddings):
+    """通过 Ollama 原生 `/api/embed` 接口生成本地向量。"""
+
+    def __init__(self, *, base_url: str, model: str):
+        self.base_url = base_url.rstrip("/")
+        self.model = model
+
+    @staticmethod
+    def _parse(payload: dict) -> list[list[float]]:
+        embeddings = payload.get("embeddings")
+        if not isinstance(embeddings, list):
+            raise ValueError("Ollama embedding response has no embeddings")
+        return embeddings
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        response = httpx.post(
+            f"{self.base_url}/api/embed",
+            json={"model": self.model, "input": texts},
+            timeout=120,
+        )
+        response.raise_for_status()
+        return self._parse(response.json())
+
+    def embed_query(self, text: str) -> list[float]:
+        return self.embed_documents([text])[0]
+
+    async def aembed_documents(self, texts: list[str]) -> list[list[float]]:
+        async with httpx.AsyncClient(timeout=120) as client:
+            response = await client.post(
+                f"{self.base_url}/api/embed",
+                json={"model": self.model, "input": texts},
+            )
+        response.raise_for_status()
+        return self._parse(response.json())
+
+    async def aembed_query(self, text: str) -> list[float]:
+        return (await self.aembed_documents([text]))[0]
 
 
 class EmbeddingClientManager:
     """管理 Embedding 服务客户端的初始化与复用"""
 
     def __init__(self, config: EmbeddingConfig):
-        self.client: Optional[HuggingFaceEndpointEmbeddings] = None
+        self.client: Optional[Embeddings] = None
         self.config = config
 
     def _get_url(self) -> str:
@@ -26,6 +67,13 @@ class EmbeddingClientManager:
 
     def init(self):
         """显式初始化客户端，避免模块导入时立即建立外部连接"""
+        if self.config.provider == "ollama":
+            self.client = OllamaEmbeddings(
+                base_url=self._get_url(), model=self.config.model
+            )
+            return
+        if self.config.provider != "huggingface_endpoint":
+            raise ValueError(f"Unsupported embedding provider: {self.config.provider}")
         self.client = HuggingFaceEndpointEmbeddings(model=self._get_url())
 
 

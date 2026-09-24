@@ -11,17 +11,17 @@ logging:
 
 db_meta:
   host: ${oc.env:META_DB_HOST,localhost}
-  port: 3306
+  port: ${oc.env:META_DB_PORT,3306}
   user: ${oc.env:META_DB_USER,gamequery_meta}
   password: ${oc.env:META_DB_PASSWORD}
-  database: meta
+  database: ${oc.env:META_DB_NAME,meta}
 
 db_dw:
   host: ${oc.env:DW_DB_HOST,localhost}
-  port: 3306
+  port: ${oc.env:DW_DB_PORT,3306}
   user: ${oc.env:DW_DB_USER,gamequery_reader}
   password: ${oc.env:DW_DB_PASSWORD}
-  database: dw
+  database: ${oc.env:DW_DB_NAME,dw}
 
 qdrant:
   host: ${oc.env:QDRANT_HOST,localhost}
@@ -29,9 +29,10 @@ qdrant:
   embedding_size: 1024
 
 embedding:
+  provider: ${oc.env:EMBEDDING_PROVIDER,huggingface_endpoint}
   host: ${oc.env:EMBEDDING_HOST,localhost}
-  port: 8081
-  model: BAAI/bge-large-zh-v1.5
+  port: ${oc.env:EMBEDDING_PORT,8081}
+  model: ${oc.env:EMBEDDING_MODEL,BAAI/bge-large-zh-v1.5}
 
 es:
   host: ${oc.env:ES_HOST,localhost}
@@ -39,9 +40,9 @@ es:
   index_name: data_agent
 
 llm:
-  model_name: Pro/zai-org/GLM-5.1
+  model_name: ${oc.env:LLM_MODEL_NAME,Pro/zai-org/GLM-5.1}
   api_key: ${oc.env:LLM_API_KEY}
-  base_url: https://api.siliconflow.cn/v1
+  base_url: ${oc.env:LLM_BASE_URL,https://api.siliconflow.cn/v1}
 
 sql_policy:
   max_rows: 500

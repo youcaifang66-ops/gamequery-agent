@@ -64,6 +64,7 @@ class QdrantConfig:
 class EmbeddingConfig:
     """Embedding 服务配置"""
 
+    provider: str
     host: str
     port: int
     model: str
