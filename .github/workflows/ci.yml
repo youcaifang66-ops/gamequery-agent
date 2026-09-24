@@ -12,10 +12,15 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RUN_SERVICE_INTEGRATION: "1"
+      RUN_SCALE_INTEGRATION: "1"
       META_DB_PASSWORD: integration-meta-password
       DW_DB_PASSWORD: integration-dw-password
       DW_DB_HOST: 127.0.0.1
       QDRANT_URL: http://127.0.0.1:6333
+      SCALE_DB_HOST: 127.0.0.1
+      SCALE_DB_PORT: "3306"
+      SCALE_DB_USER: root
+      SCALE_DB_PASSWORD: integration-root-password
     services:
       mysql:
         image: mysql:8.0
@@ -58,8 +63,10 @@ jobs:
         run: uv run python -c "from eval.run_sql_eval import evaluate; report=evaluate(); assert report['mode'] == 'static_fixture'"
       - name: Evaluate retrieval fixture and ablation
         run: uv run python -c "from eval.run_retrieval_eval import evaluate; report=evaluate('fixture'); assert report['mode'] == 'fixture'"
-      - name: Generate deterministic scale smoke data
-        run: uv run python eval/generate_scale_data.py --preset smoke --output "${{ runner.temp }}/gamequery-scale-smoke"
+      - name: Generate and independently validate scale smoke data
+        run: |
+          uv run python eval/generate_scale_data.py --preset smoke --output "${{ runner.temp }}/gamequery-scale-smoke"
+          uv run python eval/validate_scale_data.py --dataset "${{ runner.temp }}/gamequery-scale-smoke" --full-scan
       - name: Verify tests did not mutate tracked artifacts
         run: git diff --exit-code
 
