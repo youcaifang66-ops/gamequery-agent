@@ -17,7 +17,13 @@ from typing import Callable, Iterator
 
 import asyncmy
 
-from eval.validate_scale_data import DatasetValidationError, validate_dataset
+try:
+    from eval.validate_scale_data import DatasetValidationError, validate_dataset
+except ModuleNotFoundError:  # Direct script execution.
+    from validate_scale_data import (  # type: ignore[no-redef]
+        DatasetValidationError,
+        validate_dataset,
+    )
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = Path(__file__).parent / "sql" / "scale_schema.sql"

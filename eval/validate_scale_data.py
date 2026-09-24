@@ -9,7 +9,14 @@ from collections import Counter, defaultdict
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
-from eval.synthetic_profile import CAMPAIGN_DATE_ID, TARGET_GAME_ID, TARGET_LEVEL_ID
+try:
+    from eval.synthetic_profile import CAMPAIGN_DATE_ID, TARGET_GAME_ID, TARGET_LEVEL_ID
+except ModuleNotFoundError:  # Direct script execution.
+    from synthetic_profile import (  # type: ignore[no-redef]
+        CAMPAIGN_DATE_ID,
+        TARGET_GAME_ID,
+        TARGET_LEVEL_ID,
+    )
 
 REQUIRED_FILES = {
     "dim_player.csv",

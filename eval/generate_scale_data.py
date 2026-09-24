@@ -18,21 +18,38 @@ from typing import Iterable, Sequence
 
 import psutil
 
-from eval.synthetic_profile import (
-    CAMPAIGN_DATE_ID,
-    CHANNELS,
-    GAME_POOL,
-    GENERATOR_VERSION,
-    GENRES,
-    PAYMENT_POOL_CENTS,
-    PROFILE_VERSION,
-    PROVENANCE,
-    TARGET_GAME_ID,
-    TARGET_LEVEL_ID,
-    calendar_rows,
-    date_pool,
-    player_attributes,
-)
+try:
+    from eval.synthetic_profile import (
+        CAMPAIGN_DATE_ID,
+        CHANNELS,
+        GAME_POOL,
+        GENERATOR_VERSION,
+        GENRES,
+        PAYMENT_POOL_CENTS,
+        PROFILE_VERSION,
+        PROVENANCE,
+        TARGET_GAME_ID,
+        TARGET_LEVEL_ID,
+        calendar_rows,
+        date_pool,
+        player_attributes,
+    )
+except ModuleNotFoundError:  # Direct script execution.
+    from synthetic_profile import (  # type: ignore[no-redef]
+        CAMPAIGN_DATE_ID,
+        CHANNELS,
+        GAME_POOL,
+        GENERATOR_VERSION,
+        GENRES,
+        PAYMENT_POOL_CENTS,
+        PROFILE_VERSION,
+        PROVENANCE,
+        TARGET_GAME_ID,
+        TARGET_LEVEL_ID,
+        calendar_rows,
+        date_pool,
+        player_attributes,
+    )
 
 PRESET_ROWS = {
     "smoke": 1_000,

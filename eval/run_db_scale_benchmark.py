@@ -15,9 +15,20 @@ from typing import Callable
 
 import asyncmy
 
-from eval.import_scale_data import validate_database_target
-from eval.scale_report import summarize_samples, validate_scale_report
-from eval.validate_scale_data import DatasetValidationError, validate_dataset
+try:
+    from eval.import_scale_data import validate_database_target
+    from eval.scale_report import summarize_samples, validate_scale_report
+    from eval.validate_scale_data import DatasetValidationError, validate_dataset
+except ModuleNotFoundError:  # Direct script execution.
+    from import_scale_data import validate_database_target  # type: ignore[no-redef]
+    from scale_report import (  # type: ignore[no-redef]
+        summarize_samples,
+        validate_scale_report,
+    )
+    from validate_scale_data import (  # type: ignore[no-redef]
+        DatasetValidationError,
+        validate_dataset,
+    )
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 
