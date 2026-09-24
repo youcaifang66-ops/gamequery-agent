@@ -34,10 +34,11 @@ def apply_table_selection(
             ]
             if table_info["columns"]:
                 filtered_table_infos.append(table_info)
-    if filtered_table_infos:
-        return filtered_table_infos
     required = required_table_names or set()
     metric_tables = [table for table in table_infos if table["name"] in required]
+    selected_names = {table["name"] for table in filtered_table_infos}
+    if filtered_table_infos and required.issubset(selected_names):
+        return filtered_table_infos
     return metric_tables or table_infos
 
 

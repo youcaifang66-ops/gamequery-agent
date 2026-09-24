@@ -46,3 +46,20 @@ def test_unusable_model_selection_prefers_metric_dependency_tables():
         "player_id",
         "date_id",
     ]
+
+
+def test_selection_missing_metric_dependency_falls_back_to_required_table():
+    unrelated = {
+        "id": "fact_payment",
+        "name": "fact_payment",
+        "role": "fact",
+        "description": "支付事实表",
+        "columns": [{"name": "amount"}],
+    }
+    result = apply_table_selection(
+        deepcopy([*TABLES, unrelated]),
+        {"fact_payment": ["amount"]},
+        {"fact_player_daily"},
+    )
+
+    assert [table["name"] for table in result] == ["fact_player_daily"]
