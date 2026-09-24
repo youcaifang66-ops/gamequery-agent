@@ -1,7 +1,11 @@
-name: ci
+name: reliability-ci
+
 on:
   push:
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   backend:
@@ -11,10 +15,21 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.12"
-      - run: uv sync --frozen --group dev
-      - run: uv run ruff check app tests eval/run_sql_eval.py
-      - run: uv run pytest -q
-      - run: uv run python eval/run_sql_eval.py
+          enable-cache: true
+      - name: Install locked dependencies
+        run: uv sync --frozen --group dev
+      - name: Lint all Python sources
+        run: uv run ruff check app tests eval main.py
+      - name: Run deterministic tests
+        run: uv run pytest -q
+      - name: Evaluate static SQL policy fixtures
+        run: uv run python -c "from eval.run_sql_eval import evaluate; report=evaluate(); assert report['mode'] == 'static_fixture'"
+      - name: Evaluate retrieval fixture and ablation
+        run: uv run python -c "from eval.run_retrieval_eval import evaluate; report=evaluate('fixture'); assert report['mode'] == 'fixture'"
+      - name: Generate deterministic scale smoke data
+        run: uv run python eval/generate_scale_data.py --preset smoke --output "${{ runner.temp }}/gamequery-scale-smoke"
+      - name: Verify tests did not mutate tracked artifacts
+        run: git diff --exit-code
 
   frontend:
     runs-on: ubuntu-latest
@@ -31,5 +46,7 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
+      - name: Install locked frontend dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Type-check and build frontend
+        run: pnpm build
