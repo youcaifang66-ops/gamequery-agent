@@ -13,7 +13,7 @@ import time
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
-from typing import Callable, Iterator
+from typing import Callable, Iterator, NoReturn
 
 import asyncmy
 
@@ -56,7 +56,7 @@ class ScaleImportError(ValueError):
     pass
 
 
-def _fail(code: str, message: str) -> None:
+def _fail(code: str, message: str) -> NoReturn:
     raise ScaleImportError(f"{code}: {message}")
 
 
@@ -143,7 +143,6 @@ async def import_dataset(
     manifest = json.loads((dataset / "manifest.json").read_text(encoding="utf-8"))
     ledger = json.loads((dataset / "ground_truth.json").read_text(encoding="utf-8"))
     started = time.perf_counter()
-    connection = None
     try:
         connection = await connection_factory(
             host=host,
@@ -246,16 +245,13 @@ async def import_dataset(
         )
         return report
     except ScaleImportError:
-        if connection is not None:
-            await connection.rollback()
+        await connection.rollback()
         raise
     except Exception as exc:
-        if connection is not None:
-            await connection.rollback()
+        await connection.rollback()
         _fail("IMPORT_FAILED", f"{type(exc).__name__}: import operation failed")
     finally:
-        if connection is not None:
-            connection.close()
+        connection.close()
 
 
 async def _main() -> None:

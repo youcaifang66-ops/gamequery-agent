@@ -5,9 +5,10 @@ import csv
 import hashlib
 import json
 import sys
-from collections import Counter, defaultdict
+from collections import defaultdict
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
+from typing import NoReturn
 
 try:
     from eval.synthetic_profile import CAMPAIGN_DATE_ID, TARGET_GAME_ID, TARGET_LEVEL_ID
@@ -35,7 +36,7 @@ class DatasetValidationError(ValueError):
     pass
 
 
-def _fail(code: str, message: str) -> None:
+def _fail(code: str, message: str) -> NoReturn:
     raise DatasetValidationError(f"{code}: {message}")
 
 
@@ -83,7 +84,7 @@ def _scan_dataset(
     }
     active_players: set[str] = set()
     channel_players: dict[str, set[str]] = defaultdict(set)
-    revenue: Counter[str] = Counter()
+    revenue: defaultdict[str, Decimal] = defaultdict(Decimal)
     payers: set[str] = set()
     target_revenue = Decimal(0)
     level_total = 0
