@@ -5,7 +5,6 @@ import pytest
 
 from eval.generate_scale_data import DEFAULT_SEED, PRESET_ROWS, generate
 
-
 FACT_FILES = {
     "fact_player_daily.csv",
     "fact_payment.csv",
@@ -41,8 +40,7 @@ def test_generator_is_deterministic_but_seed_sensitive(tmp_path):
     for filename in FACT_FILES | {"ground_truth.json"}:
         assert first["files"][filename]["sha256"] == second["files"][filename]["sha256"]
     assert any(
-        first["files"][filename]["sha256"]
-        != different["files"][filename]["sha256"]
+        first["files"][filename]["sha256"] != different["files"][filename]["sha256"]
         for filename in FACT_FILES
     )
 
@@ -54,7 +52,9 @@ def test_manifest_has_exact_counts_business_shape_and_provenance(tmp_path):
     assert manifest["actual_fact_rows"] == manifest["requested_fact_rows"] == 5_000
     assert sum(manifest["files"][name]["rows"] for name in FACT_FILES) == 5_000
     assert manifest["provenance"]
-    assert all("url" in source and "usage" in source for source in manifest["provenance"])
+    assert all(
+        "url" in source and "usage" in source for source in manifest["provenance"]
+    )
 
     stats = manifest["business_statistics"]
     assert stats["long_tail_top_game_share"] >= 0.35
