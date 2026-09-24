@@ -51,7 +51,19 @@
     "index_elapsed_seconds": 41.84197,
     "total_elapsed_seconds": 156.00113,
     "throughput_rows_per_second": 65707.12,
-    "ground_truth_passed": true
+    "ground_truth_passed": true,
+    "post_import_statistics_refresh": {
+      "status": "measured",
+      "reason": "InnoDB metadata remained stale after bulk load and index creation; ANALYZE TABLE completed with status OK for all six tables.",
+      "tables": {
+        "dim_date": {"estimated_rows": 365, "data_bytes": 16384, "index_bytes": 0},
+        "dim_game": {"estimated_rows": 20, "data_bytes": 16384, "index_bytes": 0},
+        "dim_player": {"estimated_rows": 249343, "data_bytes": 14172160, "index_bytes": 7880704},
+        "fact_level_event": {"estimated_rows": 1991471, "data_bytes": 144392192, "index_bytes": 82509824},
+        "fact_payment": {"estimated_rows": 1992487, "data_bytes": 126566400, "index_bytes": 84623360},
+        "fact_player_daily": {"estimated_rows": 5826135, "data_bytes": 393216000, "index_bytes": 240107520}
+      }
+    }
   },
   "failure": null,
   "scope": {

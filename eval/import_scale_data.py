@@ -44,6 +44,7 @@ TABLES = {
     "fact_payment": ("fact_payment.csv", 6),
     "fact_level_event": ("fact_level_event.csv", 8),
 }
+ANALYZE_TABLES = tuple(TABLES)
 INDEX_STATEMENTS = (
     "CREATE INDEX idx_daily_date_game_player ON fact_player_daily(date_id, game_id, player_id)",
     "CREATE INDEX idx_payment_date_game_player ON fact_payment(date_id, game_id, player_id)",
@@ -199,6 +200,28 @@ async def import_dataset(
             await connection.commit()
             index_elapsed = time.perf_counter() - index_started
 
+            analyze_started = time.perf_counter()
+            analyze_targets = ", ".join(f"`{table}`" for table in ANALYZE_TABLES)
+            await cursor.execute(f"ANALYZE TABLE {analyze_targets}")
+            analyze_results = _normalize_rows(await cursor.fetchall())
+            await connection.commit()
+            analyze_elapsed = time.perf_counter() - analyze_started
+
+            await cursor.execute(
+                "SELECT TABLE_NAME, TABLE_ROWS, DATA_LENGTH, INDEX_LENGTH "
+                "FROM information_schema.TABLES "
+                "WHERE TABLE_SCHEMA=%s ORDER BY TABLE_NAME",
+                (database,),
+            )
+            optimizer_statistics = {
+                row[0]: {
+                    "estimated_rows": row[1],
+                    "data_bytes": row[2],
+                    "index_bytes": row[3],
+                }
+                for row in await cursor.fetchall()
+            }
+
             for table, metrics in table_metrics.items():
                 await cursor.execute(f"SELECT COUNT(*) FROM `{table}`")
                 database_count = (await cursor.fetchone())[0]
@@ -229,6 +252,9 @@ async def import_dataset(
             "metrics": {
                 "tables": table_metrics,
                 "index_elapsed_seconds": round(index_elapsed, 6),
+                "analyze_elapsed_seconds": round(analyze_elapsed, 6),
+                "analyze_results": analyze_results,
+                "optimizer_statistics": optimizer_statistics,
                 "total_elapsed_seconds": round(total_elapsed, 6),
                 "throughput_rows_per_second": round(total_rows / total_elapsed, 3),
                 "ground_truth_passed": True,

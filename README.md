@@ -217,6 +217,9 @@ uv run python eval/run_retrieval_eval.py --mode fixture
 
 四个并发档（1/5/10/20）共保留 720 个原始延迟样本、24 份结果一致性结论和 EXPLAIN 计划，全部 0 超时、0 执行错误。完整报告位于 `eval/results/ten_million_generation.json`、`ten_million_import.json` 和 `ten_million_db_benchmark.json`。
 
+导入器会在批量写入和二级索引创建后自动执行 `ANALYZE TABLE`，再保存
+`TABLE_ROWS`、数据字节数和索引字节数，避免 Workbench 因 InnoDB 统计未刷新而把已导入事实表显示为 0 行。
+
 复现时使用独立实验库账号；导入器只接受 `gamequery_scale_*`，并永久拒绝 `dw`、`mysql`、`meta` 等默认或系统库：
 
 ```bash

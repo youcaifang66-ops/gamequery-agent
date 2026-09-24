@@ -37,6 +37,11 @@ def test_real_mysql_smoke_pipeline(tmp_path):
         )
         assert imported["status"] == "measured"
         assert imported["metrics"]["ground_truth_passed"] is True
+        statistics = imported["metrics"]["optimizer_statistics"]
+        assert all(statistics[table]["estimated_rows"] > 0 for table in statistics)
+        assert statistics["fact_player_daily"]["index_bytes"] > 0
+        assert statistics["fact_payment"]["index_bytes"] > 0
+        assert statistics["fact_level_event"]["index_bytes"] > 0
 
         benchmark = await run_benchmark(
             dataset,

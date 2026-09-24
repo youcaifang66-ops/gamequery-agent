@@ -84,6 +84,8 @@
 
 首次正式运行暴露出 CLI 只在 pytest 模块导入下可用、直接执行 `python eval/generate_scale_data.py` 会找不到 `eval` 包。修复四个 CLI 的直接执行导入后，用真实 smoke 命令复验再重新运行 10m。隔离 MySQL 首次放在含中文路径时，8.0.26 判定 data directory 无效；改用纯 ASCII 的隔离目录和独立 3307 端口后完成实验。两次失败均未被计入 measured 结果。
 
+后续使用 Workbench 检查时发现 `information_schema.tables` 在批量导入和建索引后仍保留旧统计，导致支付表和关卡表的估算行数显示为 0，但精确 `COUNT(*)` 始终为 200 万。对六表执行 `ANALYZE TABLE` 后，事实表估算行数和索引空间恢复正常；导入器现已把统计刷新、结果和字节指标纳入固定流程及真实 MySQL 集成测试。
+
 ## 结论边界
 
 已证明的是：这台机器上的当前 Schema、四个组合索引和六类固定 SQL，能够在 1000 万合成事实行上完成正确导入和查询。没有证明真实企业数据分布、LLM Text-to-SQL 正确率、端到端 Agent P95、线上混合流量容量、业务提效或更大数据量；这些仍需在目标环境重新测量。

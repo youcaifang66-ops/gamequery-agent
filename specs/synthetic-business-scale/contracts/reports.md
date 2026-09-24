@@ -24,7 +24,9 @@ For `failed` or `not_run`, unavailable metrics are null/empty and `failure` cont
 
 ## Import Metrics
 
-Per-table expected/imported rows and elapsed time, index time, total time, throughput, MySQL version, ground-truth comparison.
+Per-table expected/imported rows and elapsed time, index time, `ANALYZE TABLE`
+time/results, refreshed optimizer row/byte statistics, total time, throughput,
+MySQL version, and ground-truth comparison.
 
 ## Database Benchmark Metrics
 

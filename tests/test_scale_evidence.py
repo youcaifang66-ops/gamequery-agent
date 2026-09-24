@@ -44,6 +44,11 @@ def test_ten_million_import_evidence_matches_every_table_and_ground_truth():
         if key.startswith("fact_")
     }
     assert sum(table["imported_rows"] for table in fact_tables.values()) == 10_000_000
+    refreshed = report["metrics"]["post_import_statistics_refresh"]
+    assert refreshed["status"] == "measured"
+    for table_name in fact_tables:
+        assert refreshed["tables"][table_name]["estimated_rows"] > 0
+        assert refreshed["tables"][table_name]["index_bytes"] > 0
 
 
 def test_ten_million_benchmark_keeps_all_raw_samples_and_plans():
