@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-SCHEMA_OPTIMIZATION_VERSION = "2026-09-26.2"
+SCHEMA_OPTIMIZATION_VERSION = "2026-09-26.3"
 
 
 @dataclass(frozen=True)
@@ -64,6 +64,11 @@ _INDEX_CATALOG = (
         "fact_payment",
         "idx_payment_date_game_amount",
         ("date_id", "game_id", "amount"),
+    ),
+    IndexSpec(
+        "fact_payment",
+        "idx_payment_game_date_amount",
+        ("game_id", "date_id", "amount"),
     ),
     IndexSpec(
         "fact_level_event",
