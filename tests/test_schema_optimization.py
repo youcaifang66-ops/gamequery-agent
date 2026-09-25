@@ -8,7 +8,7 @@ from eval.schema_optimization import (
 def test_index_catalog_covers_player_audit_and_aggregate_workloads():
     catalog = {(item.table, item.name): item.columns for item in index_catalog()}
 
-    assert SCHEMA_OPTIMIZATION_VERSION == "2026-09-26.2"
+    assert SCHEMA_OPTIMIZATION_VERSION == "2026-09-26.3"
     assert catalog[("fact_player_daily", "idx_daily_player_date")] == (
         "player_id",
         "date_id",
@@ -24,6 +24,11 @@ def test_index_catalog_covers_player_audit_and_aggregate_workloads():
     assert catalog[("fact_payment", "idx_payment_date_game_amount")] == (
         "date_id",
         "game_id",
+        "amount",
+    )
+    assert catalog[("fact_payment", "idx_payment_game_date_amount")] == (
+        "game_id",
+        "date_id",
         "amount",
     )
     assert catalog[
