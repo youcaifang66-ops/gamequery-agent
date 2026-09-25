@@ -217,6 +217,21 @@ uv run python eval/run_retrieval_eval.py --mode fixture
 
 四个并发档（1/5/10/20）共保留 720 个原始延迟样本、24 份结果一致性结论和 EXPLAIN 计划，全部 0 超时、0 执行错误。完整报告位于 `eval/results/ten_million_generation.json`、`ten_million_import.json` 和 `ten_million_db_benchmark.json`。
 
+#### 工作负载驱动优化（2026-09-26）
+
+在同一 1000 万事实行库上补充了三个 player-first 时间线索引、收入覆盖索引和高选择性通过率覆盖索引。玩家核查按画像、活跃、支付、关卡四个域独立查询，避免多事实表 JOIN 造成乘法结果；存在与不存在玩家均保存 `EXPLAIN ANALYZE`。
+
+| 玩家查询 P95 | C=1 | C=20 | 结果行数 |
+|---|---:|---:|---:|
+| 画像 | 0.3703 ms | 1.7979 ms | 1 |
+| 活跃时间线 | 0.6899 ms | 4.3387 ms | 26 |
+| 支付时间线 | 0.4690 ms | 2.4376 ms | 6 |
+| 关卡时间线 | 0.5715 ms | 2.8927 ms | 11 |
+
+六类运营 SQL 使用“同环境、同指标口径、临时将新增索引设为 invisible”的配对 before。C=1 的收入/ARPU/通过率 P95 从 899.19/412.59/1009.55 ms 降至 160.41/23.18/0.93 ms；C=20 从 729.00/1457.92/799.79 ms 降至 172.30/24.00/2.56 ms。全部样本结果一致，0 超时、0 执行错误。
+
+索引不是免费的：总索引空间从 415,121,408 bytes 增至 931,610,624 bytes，净增约 492.6 MiB。迁移器记录在线 DDL 耗时、前后结构、rollback SQL 和 `ANALYZE TABLE` 结果，并在重复 apply 时得到 0 个执行项。完整验收见 `specs/database-workload-optimization/validation.md`。
+
 导入器会在批量写入和二级索引创建后自动执行 `ANALYZE TABLE`，再保存
 `TABLE_ROWS`、数据字节数和索引字节数，避免 Workbench 因 InnoDB 统计未刷新而把已导入事实表显示为 0 行。
 
@@ -230,6 +245,8 @@ export SCALE_DB_HOST=127.0.0.1 SCALE_DB_PORT=3306
 export SCALE_DB_USER=scale_writer SCALE_DB_PASSWORD='replace-me'
 uv run python eval/import_scale_data.py --dataset artifacts/scale/ten-million --database gamequery_scale_10m --batch-size 10000 --replace
 uv run python eval/run_db_scale_benchmark.py --dataset artifacts/scale/ten-million --database gamequery_scale_10m --concurrency 1,5,10,20 --iterations 30 --warmups 3
+uv run python -m eval.optimize_scale_database --database gamequery_scale_10m --apply --output eval/results/ten_million_schema_optimization.json
+uv run python -m eval.run_player_audit_benchmark --database gamequery_scale_10m --concurrency 1,20 --iterations 30 --warmups 3 --output eval/results/ten_million_player_audit.json
 ```
 
 这些数字证明“本机 + 当前 Schema/索引 + 固定六类 SQL”能够处理千万事实行，不等于数据库容量上限、真实企业流量、端到端 Agent 延迟、LLM 准确率或业务提效。生产结论仍需在目标硬件、真实数据分布、混合工作负载和 SLA 下重新测量。
