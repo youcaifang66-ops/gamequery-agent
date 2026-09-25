@@ -1,0 +1,1218 @@
+{
+  "schema_version": "1.0",
+  "status": "measured",
+  "dataset": {
+    "fact_rows": 10000000,
+    "tables": {
+      "dim_date": {
+        "estimated_rows": 365,
+        "data_bytes": 16384,
+        "index_bytes": 0
+      },
+      "dim_game": {
+        "estimated_rows": 20,
+        "data_bytes": 16384,
+        "index_bytes": 0
+      },
+      "dim_player": {
+        "estimated_rows": 249343,
+        "data_bytes": 14172160,
+        "index_bytes": 7880704
+      },
+      "fact_level_event": {
+        "estimated_rows": 1991471,
+        "data_bytes": 144392192,
+        "index_bytes": 245432320,
+        "actual_rows": 2000000
+      },
+      "fact_payment": {
+        "estimated_rows": 1992487,
+        "data_bytes": 126566400,
+        "index_bytes": 232800256,
+        "actual_rows": 2000000
+      },
+      "fact_player_daily": {
+        "estimated_rows": 5826135,
+        "data_bytes": 393216000,
+        "index_bytes": 445497344,
+        "actual_rows": 6000000
+      }
+    }
+  },
+  "environment": {
+    "git_sha": "a409e3e14271a057c3105ff4596ae504964f4a4c",
+    "timestamp": "2026-09-25T16:28:03.046541+00:00",
+    "os": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.12.14",
+    "mysql_version": "8.0.26",
+    "database": "gamequery_scale_10m"
+  },
+  "metrics": {
+    "workload": {
+      "player_id": "P0000001",
+      "missing_player_id": "P_NOT_FOUND",
+      "warmups_per_query": 3,
+      "iterations_per_query": 30,
+      "concurrency_levels": [
+        1,
+        20
+      ],
+      "timeout_seconds": 10.0
+    },
+    "indexes": [
+      {
+        "table": "dim_date",
+        "index": "PRIMARY",
+        "column": "date_id",
+        "sequence": 1
+      },
+      {
+        "table": "dim_game",
+        "index": "PRIMARY",
+        "column": "game_id",
+        "sequence": 1
+      },
+      {
+        "table": "dim_player",
+        "index": "idx_player_channel_player",
+        "column": "acquisition_channel",
+        "sequence": 1
+      },
+      {
+        "table": "dim_player",
+        "index": "idx_player_channel_player",
+        "column": "player_id",
+        "sequence": 2
+      },
+      {
+        "table": "dim_player",
+        "index": "PRIMARY",
+        "column": "player_id",
+        "sequence": 1
+      },
+      {
+        "table": "fact_level_event",
+        "index": "idx_level_date_game_level",
+        "column": "date_id",
+        "sequence": 1
+      },
+      {
+        "table": "fact_level_event",
+        "index": "idx_level_date_game_level",
+        "column": "game_id",
+        "sequence": 2
+      },
+      {
+        "table": "fact_level_event",
+        "index": "idx_level_date_game_level",
+        "column": "level_id",
+        "sequence": 3
+      },
+      {
+        "table": "fact_level_event",
+        "index": "idx_level_date_game_level_pass_attempts",
+        "column": "date_id",
+        "sequence": 1
+      },
+      {
+        "table": "fact_level_event",
+        "index": "idx_level_date_game_level_pass_attempts",
+        "column": "game_id",
+        "sequence": 2
+      },
+      {
+        "table": "fact_level_event",
+        "index": "idx_level_date_game_level_pass_attempts",
+        "column": "level_id",
+        "sequence": 3
+      },
+      {
+        "table": "fact_level_event",
+        "index": "idx_level_date_game_level_pass_attempts",
+        "column": "passed",
+        "sequence": 4
+      },
+      {
+        "table": "fact_level_event",
+        "index": "idx_level_date_game_level_pass_attempts",
+        "column": "attempts",
+        "sequence": 5
+      },
+      {
+        "table": "fact_level_event",
+        "index": "idx_level_player_date",
+        "column": "player_id",
+        "sequence": 1
+      },
+      {
+        "table": "fact_level_event",
+        "index": "idx_level_player_date",
+        "column": "date_id",
+        "sequence": 2
+      },
+      {
+        "table": "fact_level_event",
+        "index": "PRIMARY",
+        "column": "event_id",
+        "sequence": 1
+      },
+      {
+        "table": "fact_payment",
+        "index": "idx_payment_date_game_amount",
+        "column": "date_id",
+        "sequence": 1
+      },
+      {
+        "table": "fact_payment",
+        "index": "idx_payment_date_game_amount",
+        "column": "game_id",
+        "sequence": 2
+      },
+      {
+        "table": "fact_payment",
+        "index": "idx_payment_date_game_amount",
+        "column": "amount",
+        "sequence": 3
+      },
+      {
+        "table": "fact_payment",
+        "index": "idx_payment_date_game_player",
+        "column": "date_id",
+        "sequence": 1
+      },
+      {
+        "table": "fact_payment",
+        "index": "idx_payment_date_game_player",
+        "column": "game_id",
+        "sequence": 2
+      },
+      {
+        "table": "fact_payment",
+        "index": "idx_payment_date_game_player",
+        "column": "player_id",
+        "sequence": 3
+      },
+      {
+        "table": "fact_payment",
+        "index": "idx_payment_player_date",
+        "column": "player_id",
+        "sequence": 1
+      },
+      {
+        "table": "fact_payment",
+        "index": "idx_payment_player_date",
+        "column": "date_id",
+        "sequence": 2
+      },
+      {
+        "table": "fact_payment",
+        "index": "PRIMARY",
+        "column": "payment_id",
+        "sequence": 1
+      },
+      {
+        "table": "fact_player_daily",
+        "index": "idx_daily_date_game_player",
+        "column": "date_id",
+        "sequence": 1
+      },
+      {
+        "table": "fact_player_daily",
+        "index": "idx_daily_date_game_player",
+        "column": "game_id",
+        "sequence": 2
+      },
+      {
+        "table": "fact_player_daily",
+        "index": "idx_daily_date_game_player",
+        "column": "player_id",
+        "sequence": 3
+      },
+      {
+        "table": "fact_player_daily",
+        "index": "idx_daily_player_date",
+        "column": "player_id",
+        "sequence": 1
+      },
+      {
+        "table": "fact_player_daily",
+        "index": "idx_daily_player_date",
+        "column": "date_id",
+        "sequence": 2
+      },
+      {
+        "table": "fact_player_daily",
+        "index": "PRIMARY",
+        "column": "event_id",
+        "sequence": 1
+      }
+    ],
+    "elapsed_seconds": 0.39201,
+    "concurrency_runs": [
+      {
+        "concurrency": 1,
+        "elapsed_seconds": 0.076512,
+        "queries": {
+          "player_profile": {
+            "samples_ms": [
+              0.2435,
+              0.1765,
+              0.1672,
+              0.1638,
+              0.1624,
+              0.1625,
+              0.1653,
+              0.1624,
+              0.1592,
+              0.1624,
+              0.1585,
+              0.158,
+              0.161,
+              0.1577,
+              0.1565,
+              0.157,
+              0.1566,
+              0.2968,
+              0.2485,
+              0.1904,
+              0.183,
+              0.1919,
+              0.177,
+              0.1688,
+              0.1613,
+              0.1585,
+              0.1618,
+              0.1584,
+              0.1605,
+              0.1623
+            ],
+            "sample_count": 30,
+            "success_rate": 1.0,
+            "p50_ms": 0.1624,
+            "p95_ms": 0.2485,
+            "p99_ms": 0.2968,
+            "max_ms": 0.2968,
+            "timeout_count": 0,
+            "timeout_rate": 0.0,
+            "error_count": 0,
+            "result_mismatch_count": 0,
+            "result_match": true,
+            "result_row_count": 1,
+            "result_sha256": "2b9808ec1a9ac2359938a5435cc4d5d0d80071f5af05c09e9a1edcfb97d8c4f8",
+            "result_preview": [
+              [
+                "P0000001",
+                "2026-01-01",
+                "华北",
+                "iOS",
+                "自然量"
+              ]
+            ],
+            "throughput_qps": 4811.007585,
+            "explain_analyze": "-> Rows fetched before execution  (cost=0.00..0.00 rows=1) (actual time=0.000..0.000 rows=1 loops=1)\n",
+            "sql": "SELECT player_id, register_date, region, platform, acquisition_channel FROM dim_player WHERE player_id=%(player_id)s",
+            "params": {
+              "player_id": "P0000001"
+            }
+          },
+          "player_activity_timeline": {
+            "samples_ms": [
+              0.4548,
+              0.3837,
+              0.4372,
+              0.4405,
+              0.3775,
+              0.3675,
+              0.3676,
+              0.3651,
+              0.4945,
+              0.4273,
+              0.4308,
+              0.5999,
+              0.345,
+              0.3733,
+              0.3285,
+              0.323,
+              0.3273,
+              0.3245,
+              0.4912,
+              0.426,
+              0.3635,
+              0.333,
+              0.3304,
+              0.3281,
+              0.3485,
+              0.3327,
+              0.3264,
+              0.3501,
+              0.374,
+              0.341
+            ],
+            "sample_count": 30,
+            "success_rate": 1.0,
+            "p50_ms": 0.3651,
+            "p95_ms": 0.4945,
+            "p99_ms": 0.5999,
+            "max_ms": 0.5999,
+            "timeout_count": 0,
+            "timeout_rate": 0.0,
+            "error_count": 0,
+            "result_mismatch_count": 0,
+            "result_match": true,
+            "result_row_count": 26,
+            "result_sha256": "189d2850a80a39b75c5f8bb5f55e2488901d5fd29421d88e8b9d8d21ba9b236a",
+            "result_preview": [
+              [
+                "A001050950",
+                "P0000001",
+                "G005",
+                20260113,
+                3,
+                22,
+                35,
+                1
+              ],
+              [
+                "A001126699",
+                "P0000001",
+                "G002",
+                20260116,
+                2,
+                179,
+                77,
+                1
+              ],
+              [
+                "A001553023",
+                "P0000001",
+                "G002",
+                20260122,
+                6,
+                83,
+                26,
+                1
+              ]
+            ],
+            "throughput_qps": 2377.593558,
+            "explain_analyze": "-> Index lookup on fact_player_daily using idx_daily_player_date (player_id='P0000001')  (cost=26.16 rows=26) (actual time=0.060..0.063 rows=26 loops=1)\n",
+            "sql": "SELECT event_id, player_id, game_id, date_id, login_count, online_minutes, level_reached, is_active FROM fact_player_daily WHERE player_id=%(player_id)s ORDER BY date_id, event_id",
+            "params": {
+              "player_id": "P0000001"
+            }
+          },
+          "player_payment_timeline": {
+            "samples_ms": [
+              0.2903,
+              0.2308,
+              0.223,
+              0.2192,
+              0.2191,
+              0.217,
+              0.4512,
+              0.3359,
+              0.2464,
+              0.226,
+              0.2188,
+              0.2187,
+              0.2154,
+              0.2156,
+              0.2118,
+              0.2134,
+              0.2875,
+              0.2196,
+              0.2893,
+              0.2334,
+              0.2082,
+              0.2255,
+              0.2065,
+              0.2062,
+              0.2058,
+              0.2068,
+              0.2051,
+              0.2047,
+              0.2047,
+              0.2069
+            ],
+            "sample_count": 30,
+            "success_rate": 1.0,
+            "p50_ms": 0.2187,
+            "p95_ms": 0.3359,
+            "p99_ms": 0.4512,
+            "max_ms": 0.4512,
+            "timeout_count": 0,
+            "timeout_rate": 0.0,
+            "error_count": 0,
+            "result_mismatch_count": 0,
+            "result_match": true,
+            "result_row_count": 6,
+            "result_sha256": "dfe844426950e4b58504cc0ecadbbcb3b7cc0bea863ebd353c179c46d08a892b",
+            "result_preview": [
+              [
+                "PAY000394048",
+                "P0000001",
+                "G001",
+                20260413,
+                "3.00",
+                "CNY"
+              ],
+              [
+                "PAY000172241",
+                "P0000001",
+                "G001",
+                20260613,
+                "12.00",
+                "CNY"
+              ],
+              [
+                "PAY000000001",
+                "P0000001",
+                "G001",
+                20260918,
+                "3.00",
+                "CNY"
+              ]
+            ],
+            "throughput_qps": 3733.758152,
+            "explain_analyze": "-> Index lookup on fact_payment using idx_payment_player_date (player_id='P0000001')  (cost=6.59 rows=6) (actual time=0.017..0.018 rows=6 loops=1)\n",
+            "sql": "SELECT payment_id, player_id, game_id, date_id, amount, currency FROM fact_payment WHERE player_id=%(player_id)s ORDER BY date_id, payment_id",
+            "params": {
+              "player_id": "P0000001"
+            }
+          },
+          "player_level_timeline": {
+            "samples_ms": [
+              0.3571,
+              0.2835,
+              0.2604,
+              0.2608,
+              0.2588,
+              0.257,
+              0.3335,
+              0.3338,
+              0.2658,
+              0.2683,
+              0.2577,
+              0.2746,
+              0.3564,
+              0.2498,
+              0.2369,
+              0.2378,
+              0.2364,
+              0.242,
+              0.2368,
+              0.2359,
+              0.2366,
+              0.288,
+              0.3152,
+              0.2663,
+              0.2431,
+              0.241,
+              0.2373,
+              0.2363,
+              0.2366,
+              0.2393
+            ],
+            "sample_count": 30,
+            "success_rate": 1.0,
+            "p50_ms": 0.257,
+            "p95_ms": 0.3564,
+            "p99_ms": 0.3571,
+            "max_ms": 0.3571,
+            "timeout_count": 0,
+            "timeout_rate": 0.0,
+            "error_count": 0,
+            "result_mismatch_count": 0,
+            "result_match": true,
+            "result_row_count": 11,
+            "result_sha256": "5f6128517321f925e3fed1c3aad3b63d3690827056b85553a05dfc25f2cba2e5",
+            "result_preview": [
+              [
+                "L000847533",
+                "P0000001",
+                "G003",
+                20260118,
+                "LEVEL_064",
+                5,
+                1,
+                1584
+              ],
+              [
+                "L000433360",
+                "P0000001",
+                "G003",
+                20260318,
+                "LEVEL_019",
+                2,
+                1,
+                1365
+              ],
+              [
+                "L001304654",
+                "P0000001",
+                "G001",
+                20260407,
+                "LEVEL_090",
+                6,
+                1,
+                1685
+              ]
+            ],
+            "throughput_qps": 3343.661532,
+            "explain_analyze": "-> Index lookup on fact_level_event using idx_level_player_date (player_id='P0000001')  (cost=8.43 rows=11) (actual time=0.030..0.032 rows=11 loops=1)\n",
+            "sql": "SELECT event_id, player_id, game_id, date_id, level_id, attempts, passed, duration_seconds FROM fact_level_event WHERE player_id=%(player_id)s ORDER BY date_id, event_id",
+            "params": {
+              "player_id": "P0000001"
+            }
+          },
+          "missing_player_activity_timeline": {
+            "samples_ms": [
+              0.3146,
+              0.2469,
+              0.1893,
+              0.1836,
+              0.1825,
+              0.1789,
+              0.1767,
+              0.1765,
+              0.1934,
+              0.1763,
+              0.1752,
+              0.175,
+              0.1751,
+              0.1738,
+              0.1751,
+              0.1802,
+              0.2539,
+              0.334,
+              0.2839,
+              0.2054,
+              0.1882,
+              0.1809,
+              0.1774,
+              0.1812,
+              0.1793,
+              0.1856,
+              0.1761,
+              0.1758,
+              0.1832,
+              0.2275
+            ],
+            "sample_count": 30,
+            "success_rate": 1.0,
+            "p50_ms": 0.1809,
+            "p95_ms": 0.3146,
+            "p99_ms": 0.334,
+            "max_ms": 0.334,
+            "timeout_count": 0,
+            "timeout_rate": 0.0,
+            "error_count": 0,
+            "result_mismatch_count": 0,
+            "result_match": true,
+            "result_row_count": 0,
+            "result_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "result_preview": [],
+            "throughput_qps": 4317.727149,
+            "explain_analyze": "-> Index lookup on fact_player_daily using idx_daily_player_date (player_id='P_NOT_FOUND')  (cost=1.01 rows=1) (actual time=0.004..0.004 rows=0 loops=1)\n",
+            "sql": "SELECT event_id, player_id, game_id, date_id, login_count, online_minutes, level_reached, is_active FROM fact_player_daily WHERE player_id=%(player_id)s ORDER BY date_id, event_id",
+            "params": {
+              "player_id": "P_NOT_FOUND"
+            }
+          },
+          "missing_player_payment_timeline": {
+            "samples_ms": [
+              0.2489,
+              0.1779,
+              0.1772,
+              0.171,
+              0.1694,
+              0.1732,
+              0.1683,
+              0.2243,
+              0.2077,
+              0.1782,
+              0.1713,
+              0.1692,
+              0.1694,
+              0.1679,
+              0.1672,
+              0.1688,
+              0.1665,
+              0.1663,
+              0.1658,
+              0.1937,
+              0.2561,
+              0.208,
+              0.1821,
+              0.1746,
+              0.1748,
+              0.2025,
+              0.1721,
+              0.1701,
+              0.1683,
+              0.1679
+            ],
+            "sample_count": 30,
+            "success_rate": 1.0,
+            "p50_ms": 0.1713,
+            "p95_ms": 0.2489,
+            "p99_ms": 0.2561,
+            "max_ms": 0.2561,
+            "timeout_count": 0,
+            "timeout_rate": 0.0,
+            "error_count": 0,
+            "result_mismatch_count": 0,
+            "result_match": true,
+            "result_row_count": 0,
+            "result_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "result_preview": [],
+            "throughput_qps": 4705.218087,
+            "explain_analyze": "-> Index lookup on fact_payment using idx_payment_player_date (player_id='P_NOT_FOUND')  (cost=1.10 rows=1) (actual time=0.004..0.004 rows=0 loops=1)\n",
+            "sql": "SELECT payment_id, player_id, game_id, date_id, amount, currency FROM fact_payment WHERE player_id=%(player_id)s ORDER BY date_id, payment_id",
+            "params": {
+              "player_id": "P_NOT_FOUND"
+            }
+          },
+          "missing_player_level_timeline": {
+            "samples_ms": [
+              0.2562,
+              0.1886,
+              0.1822,
+              0.1787,
+              0.1755,
+              0.1751,
+              0.1761,
+              0.1783,
+              0.1729,
+              0.2406,
+              0.1791,
+              0.1775,
+              0.171,
+              0.5368,
+              0.3149,
+              0.2395,
+              0.2044,
+              0.186,
+              0.1784,
+              0.1776,
+              0.1758,
+              0.1742,
+              0.173,
+              0.1746,
+              0.1753,
+              0.1748,
+              0.1724,
+              0.1712,
+              0.1706,
+              0.2406
+            ],
+            "sample_count": 30,
+            "success_rate": 1.0,
+            "p50_ms": 0.1775,
+            "p95_ms": 0.3149,
+            "p99_ms": 0.5368,
+            "max_ms": 0.5368,
+            "timeout_count": 0,
+            "timeout_rate": 0.0,
+            "error_count": 0,
+            "result_mismatch_count": 0,
+            "result_match": true,
+            "result_row_count": 0,
+            "result_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "result_preview": [],
+            "throughput_qps": 4229.522064,
+            "explain_analyze": "-> Index lookup on fact_level_event using idx_level_player_date (player_id='P_NOT_FOUND')  (cost=0.77 rows=1) (actual time=0.004..0.004 rows=0 loops=1)\n",
+            "sql": "SELECT event_id, player_id, game_id, date_id, level_id, attempts, passed, duration_seconds FROM fact_level_event WHERE player_id=%(player_id)s ORDER BY date_id, event_id",
+            "params": {
+              "player_id": "P_NOT_FOUND"
+            }
+          }
+        }
+      },
+      {
+        "concurrency": 20,
+        "elapsed_seconds": 0.098778,
+        "queries": {
+          "player_profile": {
+            "samples_ms": [
+              1.0316,
+              1.0748,
+              1.1163,
+              1.1646,
+              1.1682,
+              1.1935,
+              1.3732,
+              1.317,
+              1.3638,
+              1.3747,
+              1.4163,
+              1.5433,
+              1.1273,
+              1.0867,
+              1.0388,
+              0.9876,
+              0.9408,
+              0.8945,
+              0.8487,
+              0.8029,
+              0.7498,
+              0.6991,
+              17.7237,
+              17.7526,
+              17.706,
+              17.8047,
+              18.0306,
+              18.3454,
+              18.079,
+              18.4059
+            ],
+            "sample_count": 30,
+            "success_rate": 1.0,
+            "p50_ms": 1.1682,
+            "p95_ms": 18.3454,
+            "p99_ms": 18.4059,
+            "max_ms": 18.4059,
+            "timeout_count": 0,
+            "timeout_rate": 0.0,
+            "error_count": 0,
+            "result_mismatch_count": 0,
+            "result_match": true,
+            "result_row_count": 1,
+            "result_sha256": "2b9808ec1a9ac2359938a5435cc4d5d0d80071f5af05c09e9a1edcfb97d8c4f8",
+            "result_preview": [
+              [
+                "P0000001",
+                "2026-01-01",
+                "华北",
+                "iOS",
+                "自然量"
+              ]
+            ],
+            "throughput_qps": 1172.809583,
+            "explain_analyze": "-> Rows fetched before execution  (cost=0.00..0.00 rows=1) (actual time=0.000..0.000 rows=1 loops=1)\n",
+            "sql": "SELECT player_id, register_date, region, platform, acquisition_channel FROM dim_player WHERE player_id=%(player_id)s",
+            "params": {
+              "player_id": "P0000001"
+            }
+          },
+          "player_activity_timeline": {
+            "samples_ms": [
+              1.0929,
+              1.2705,
+              1.4384,
+              1.606,
+              1.7705,
+              1.9389,
+              1.9906,
+              2.2069,
+              2.5723,
+              2.5128,
+              2.8,
+              3.0411,
+              3.282,
+              3.5109,
+              3.5596,
+              3.6906,
+              3.9959,
+              3.9042,
+              4.0168,
+              4.3898,
+              4.0228,
+              3.9558,
+              3.902,
+              3.8525,
+              3.8074,
+              3.7604,
+              4.2297,
+              4.1063,
+              4.0566,
+              4.0087
+            ],
+            "sample_count": 30,
+            "success_rate": 1.0,
+            "p50_ms": 3.5596,
+            "p95_ms": 4.2297,
+            "p99_ms": 4.3898,
+            "max_ms": 4.3898,
+            "timeout_count": 0,
+            "timeout_rate": 0.0,
+            "error_count": 0,
+            "result_mismatch_count": 0,
+            "result_match": true,
+            "result_row_count": 26,
+            "result_sha256": "189d2850a80a39b75c5f8bb5f55e2488901d5fd29421d88e8b9d8d21ba9b236a",
+            "result_preview": [
+              [
+                "A001050950",
+                "P0000001",
+                "G005",
+                20260113,
+                3,
+                22,
+                35,
+                1
+              ],
+              [
+                "A001126699",
+                "P0000001",
+                "G002",
+                20260116,
+                2,
+                179,
+                77,
+                1
+              ],
+              [
+                "A001553023",
+                "P0000001",
+                "G002",
+                20260122,
+                6,
+                83,
+                26,
+                1
+              ]
+            ],
+            "throughput_qps": 2225.60184,
+            "explain_analyze": "-> Index lookup on fact_player_daily using idx_daily_player_date (player_id='P0000001')  (cost=26.19 rows=26) (actual time=0.024..0.026 rows=26 loops=1)\n",
+            "sql": "SELECT event_id, player_id, game_id, date_id, login_count, online_minutes, level_reached, is_active FROM fact_player_daily WHERE player_id=%(player_id)s ORDER BY date_id, event_id",
+            "params": {
+              "player_id": "P0000001"
+            }
+          },
+          "player_payment_timeline": {
+            "samples_ms": [
+              1.0289,
+              1.0896,
+              1.1563,
+              1.2264,
+              1.2148,
+              1.3949,
+              1.3819,
+              1.5621,
+              1.5554,
+              1.6315,
+              1.6616,
+              1.7695,
+              1.7205,
+              1.7476,
+              1.9583,
+              2.1784,
+              2.1225,
+              2.106,
+              2.1362,
+              2.3763,
+              2.2116,
+              2.1569,
+              2.1041,
+              2.056,
+              2.0097,
+              1.9653,
+              1.9192,
+              1.8757,
+              1.822,
+              1.7679
+            ],
+            "sample_count": 30,
+            "success_rate": 1.0,
+            "p50_ms": 1.7695,
+            "p95_ms": 2.2116,
+            "p99_ms": 2.3763,
+            "max_ms": 2.3763,
+            "timeout_count": 0,
+            "timeout_rate": 0.0,
+            "error_count": 0,
+            "result_mismatch_count": 0,
+            "result_match": true,
+            "result_row_count": 6,
+            "result_sha256": "dfe844426950e4b58504cc0ecadbbcb3b7cc0bea863ebd353c179c46d08a892b",
+            "result_preview": [
+              [
+                "PAY000394048",
+                "P0000001",
+                "G001",
+                20260413,
+                "3.00",
+                "CNY"
+              ],
+              [
+                "PAY000172241",
+                "P0000001",
+                "G001",
+                20260613,
+                "12.00",
+                "CNY"
+              ],
+              [
+                "PAY000000001",
+                "P0000001",
+                "G001",
+                20260918,
+                "3.00",
+                "CNY"
+              ]
+            ],
+            "throughput_qps": 3030.149992,
+            "explain_analyze": "-> Index lookup on fact_payment using idx_payment_player_date (player_id='P0000001')  (cost=6.59 rows=6) (actual time=0.010..0.011 rows=6 loops=1)\n",
+            "sql": "SELECT payment_id, player_id, game_id, date_id, amount, currency FROM fact_payment WHERE player_id=%(player_id)s ORDER BY date_id, payment_id",
+            "params": {
+              "player_id": "P0000001"
+            }
+          },
+          "player_level_timeline": {
+            "samples_ms": [
+              1.0475,
+              1.1428,
+              1.2421,
+              1.3456,
+              1.4493,
+              1.5068,
+              1.5743,
+              1.7461,
+              1.9521,
+              1.9319,
+              1.9046,
+              2.1376,
+              2.2025,
+              2.373,
+              2.5586,
+              2.6236,
+              2.9447,
+              2.7837,
+              3.1139,
+              3.1083,
+              2.9453,
+              2.8912,
+              2.8414,
+              2.7889,
+              2.7447,
+              2.7141,
+              2.6651,
+              2.6194,
+              2.5757,
+              2.5367
+            ],
+            "sample_count": 30,
+            "success_rate": 1.0,
+            "p50_ms": 2.5367,
+            "p95_ms": 3.1083,
+            "p99_ms": 3.1139,
+            "max_ms": 3.1139,
+            "timeout_count": 0,
+            "timeout_rate": 0.0,
+            "error_count": 0,
+            "result_mismatch_count": 0,
+            "result_match": true,
+            "result_row_count": 11,
+            "result_sha256": "5f6128517321f925e3fed1c3aad3b63d3690827056b85553a05dfc25f2cba2e5",
+            "result_preview": [
+              [
+                "L000847533",
+                "P0000001",
+                "G003",
+                20260118,
+                "LEVEL_064",
+                5,
+                1,
+                1584
+              ],
+              [
+                "L000433360",
+                "P0000001",
+                "G003",
+                20260318,
+                "LEVEL_019",
+                2,
+                1,
+                1365
+              ],
+              [
+                "L001304654",
+                "P0000001",
+                "G001",
+                20260407,
+                "LEVEL_090",
+                6,
+                1,
+                1685
+              ]
+            ],
+            "throughput_qps": 2817.351126,
+            "explain_analyze": "-> Index lookup on fact_level_event using idx_level_player_date (player_id='P0000001')  (cost=8.43 rows=11) (actual time=0.014..0.016 rows=11 loops=1)\n",
+            "sql": "SELECT event_id, player_id, game_id, date_id, level_id, attempts, passed, duration_seconds FROM fact_level_event WHERE player_id=%(player_id)s ORDER BY date_id, event_id",
+            "params": {
+              "player_id": "P0000001"
+            }
+          },
+          "missing_player_activity_timeline": {
+            "samples_ms": [
+              1.0121,
+              1.0491,
+              1.0999,
+              1.149,
+              1.1846,
+              1.2233,
+              1.2632,
+              1.3036,
+              1.3491,
+              1.3519,
+              1.4692,
+              1.4368,
+              1.4389,
+              1.4419,
+              1.4032,
+              1.7307,
+              1.7039,
+              1.7072,
+              1.8308,
+              1.7401,
+              1.689,
+              1.6417,
+              1.5877,
+              1.539,
+              1.4945,
+              1.451,
+              1.4101,
+              1.3698,
+              1.3257,
+              1.285
+            ],
+            "sample_count": 30,
+            "success_rate": 1.0,
+            "p50_ms": 1.4101,
+            "p95_ms": 1.7401,
+            "p99_ms": 1.8308,
+            "max_ms": 1.8308,
+            "timeout_count": 0,
+            "timeout_rate": 0.0,
+            "error_count": 0,
+            "result_mismatch_count": 0,
+            "result_match": true,
+            "result_row_count": 0,
+            "result_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "result_preview": [],
+            "throughput_qps": 3418.413856,
+            "explain_analyze": "-> Index lookup on fact_player_daily using idx_daily_player_date (player_id='P_NOT_FOUND')  (cost=1.01 rows=1) (actual time=0.004..0.004 rows=0 loops=1)\n",
+            "sql": "SELECT event_id, player_id, game_id, date_id, login_count, online_minutes, level_reached, is_active FROM fact_player_daily WHERE player_id=%(player_id)s ORDER BY date_id, event_id",
+            "params": {
+              "player_id": "P_NOT_FOUND"
+            }
+          },
+          "missing_player_payment_timeline": {
+            "samples_ms": [
+              0.9818,
+              1.0137,
+              1.0504,
+              1.0878,
+              1.0855,
+              1.2007,
+              1.1985,
+              1.2327,
+              1.266,
+              1.2993,
+              1.3344,
+              1.3355,
+              1.3319,
+              1.3368,
+              1.331,
+              1.3262,
+              1.3222,
+              1.6129,
+              1.6209,
+              1.7393,
+              1.5965,
+              1.5479,
+              1.5046,
+              1.4618,
+              1.4213,
+              1.3778,
+              1.3382,
+              1.2995,
+              1.272,
+              1.2357
+            ],
+            "sample_count": 30,
+            "success_rate": 1.0,
+            "p50_ms": 1.3262,
+            "p95_ms": 1.6209,
+            "p99_ms": 1.7393,
+            "max_ms": 1.7393,
+            "timeout_count": 0,
+            "timeout_rate": 0.0,
+            "error_count": 0,
+            "result_mismatch_count": 0,
+            "result_match": true,
+            "result_row_count": 0,
+            "result_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "result_preview": [],
+            "throughput_qps": 3483.47093,
+            "explain_analyze": "-> Index lookup on fact_payment using idx_payment_player_date (player_id='P_NOT_FOUND')  (cost=1.10 rows=1) (actual time=0.006..0.006 rows=0 loops=1)\n",
+            "sql": "SELECT payment_id, player_id, game_id, date_id, amount, currency FROM fact_payment WHERE player_id=%(player_id)s ORDER BY date_id, payment_id",
+            "params": {
+              "player_id": "P_NOT_FOUND"
+            }
+          },
+          "missing_player_level_timeline": {
+            "samples_ms": [
+              1.1514,
+              1.1903,
+              1.2324,
+              1.2715,
+              1.2753,
+              1.3965,
+              1.2839,
+              1.4218,
+              1.5562,
+              1.4805,
+              1.5074,
+              1.4521,
+              1.449,
+              1.5945,
+              1.4888,
+              1.4867,
+              1.7411,
+              1.8406,
+              1.7159,
+              1.9457,
+              1.8042,
+              1.7594,
+              1.7169,
+              1.6742,
+              1.6316,
+              1.5899,
+              1.5484,
+              1.5059,
+              1.4671,
+              1.4141
+            ],
+            "sample_count": 30,
+            "success_rate": 1.0,
+            "p50_ms": 1.4888,
+            "p95_ms": 1.8406,
+            "p99_ms": 1.9457,
+            "max_ms": 1.9457,
+            "timeout_count": 0,
+            "timeout_rate": 0.0,
+            "error_count": 0,
+            "result_mismatch_count": 0,
+            "result_match": true,
+            "result_row_count": 0,
+            "result_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "result_preview": [],
+            "throughput_qps": 3382.377812,
+            "explain_analyze": "-> Index lookup on fact_level_event using idx_level_player_date (player_id='P_NOT_FOUND')  (cost=0.77 rows=1) (actual time=0.004..0.004 rows=0 loops=1)\n",
+            "sql": "SELECT event_id, player_id, game_id, date_id, level_id, attempts, passed, duration_seconds FROM fact_level_event WHERE player_id=%(player_id)s ORDER BY date_id, event_id",
+            "params": {
+              "player_id": "P_NOT_FOUND"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "failure": null,
+  "scope": {
+    "synthetic": true,
+    "extrapolated": false,
+    "max_claimed_rows": 10000000
+  }
+}

@@ -30,3 +30,11 @@ def test_mvp_contains_required_game_metrics():
     config = yaml.safe_load((ROOT / "conf" / "meta_config.yaml").read_text(encoding="utf-8"))
     metric_names = {metric["name"] for metric in config["metrics"]}
     assert {"DAU", "Revenue", "PayerCount", "ARPU", "LevelPassRate"} <= metric_names
+
+
+def test_level_pass_rate_uses_attempt_weighted_formula():
+    config = yaml.safe_load((ROOT / "conf" / "metrics.yaml").read_text(encoding="utf-8"))
+    metric = next(item for item in config["metrics"] if item["name"] == "LevelPassRate")
+
+    normalized = metric["formula"].replace(" ", "").upper()
+    assert normalized == "SUM(F.PASSED)/NULLIF(SUM(F.ATTEMPTS),0)"

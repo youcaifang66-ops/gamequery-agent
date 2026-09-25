@@ -1,0 +1,413 @@
+{
+  "schema_version": "1.0",
+  "migration_version": "2026-09-26.4",
+  "status": "measured",
+  "mode": "apply",
+  "environment": {
+    "git_sha": "62ff2d72aa5de8b4ecfa581b97e29a56a086670a",
+    "timestamp": "2026-09-25T16:40:04.978072+00:00",
+    "os": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.12.14",
+    "mysql_version": "8.0.26",
+    "database": "gamequery_scale_10m"
+  },
+  "plan": [
+    {
+      "table": "fact_player_daily",
+      "index": "idx_daily_date_game_player",
+      "columns": [
+        "date_id",
+        "game_id",
+        "player_id"
+      ],
+      "status": "already_present",
+      "sql": null,
+      "rollback_sql": "DROP INDEX `idx_daily_date_game_player` ON `fact_player_daily`"
+    },
+    {
+      "table": "fact_payment",
+      "index": "idx_payment_date_game_player",
+      "columns": [
+        "date_id",
+        "game_id",
+        "player_id"
+      ],
+      "status": "already_present",
+      "sql": null,
+      "rollback_sql": "DROP INDEX `idx_payment_date_game_player` ON `fact_payment`"
+    },
+    {
+      "table": "fact_level_event",
+      "index": "idx_level_date_game_level",
+      "columns": [
+        "date_id",
+        "game_id",
+        "level_id"
+      ],
+      "status": "already_present",
+      "sql": null,
+      "rollback_sql": "DROP INDEX `idx_level_date_game_level` ON `fact_level_event`"
+    },
+    {
+      "table": "dim_player",
+      "index": "idx_player_channel_player",
+      "columns": [
+        "acquisition_channel",
+        "player_id"
+      ],
+      "status": "already_present",
+      "sql": null,
+      "rollback_sql": "DROP INDEX `idx_player_channel_player` ON `dim_player`"
+    },
+    {
+      "table": "fact_player_daily",
+      "index": "idx_daily_player_date",
+      "columns": [
+        "player_id",
+        "date_id"
+      ],
+      "status": "already_present",
+      "sql": null,
+      "rollback_sql": "DROP INDEX `idx_daily_player_date` ON `fact_player_daily`"
+    },
+    {
+      "table": "fact_payment",
+      "index": "idx_payment_player_date",
+      "columns": [
+        "player_id",
+        "date_id"
+      ],
+      "status": "already_present",
+      "sql": null,
+      "rollback_sql": "DROP INDEX `idx_payment_player_date` ON `fact_payment`"
+    },
+    {
+      "table": "fact_level_event",
+      "index": "idx_level_player_date",
+      "columns": [
+        "player_id",
+        "date_id"
+      ],
+      "status": "already_present",
+      "sql": null,
+      "rollback_sql": "DROP INDEX `idx_level_player_date` ON `fact_level_event`"
+    },
+    {
+      "table": "fact_payment",
+      "index": "idx_payment_date_game_amount",
+      "columns": [
+        "date_id",
+        "game_id",
+        "amount"
+      ],
+      "status": "already_present",
+      "sql": null,
+      "rollback_sql": "DROP INDEX `idx_payment_date_game_amount` ON `fact_payment`"
+    },
+    {
+      "table": "fact_level_event",
+      "index": "idx_level_date_game_level_pass_attempts",
+      "columns": [
+        "date_id",
+        "game_id",
+        "level_id",
+        "passed",
+        "attempts"
+      ],
+      "status": "already_present",
+      "sql": null,
+      "rollback_sql": "DROP INDEX `idx_level_date_game_level_pass_attempts` ON `fact_level_event`"
+    },
+    {
+      "table": "fact_level_event",
+      "index": "idx_level_game_level_date_pass_attempts",
+      "columns": [
+        "game_id",
+        "level_id",
+        "date_id",
+        "passed",
+        "attempts"
+      ],
+      "status": "already_present",
+      "sql": null,
+      "rollback_sql": "DROP INDEX `idx_level_game_level_date_pass_attempts` ON `fact_level_event`"
+    }
+  ],
+  "executed": [],
+  "rollback_sql": [],
+  "before": {
+    "indexes": {
+      "dim_date": {
+        "PRIMARY": [
+          "date_id"
+        ]
+      },
+      "dim_game": {
+        "PRIMARY": [
+          "game_id"
+        ]
+      },
+      "dim_player": {
+        "idx_player_channel_player": [
+          "acquisition_channel",
+          "player_id"
+        ],
+        "PRIMARY": [
+          "player_id"
+        ]
+      },
+      "fact_level_event": {
+        "idx_level_date_game_level": [
+          "date_id",
+          "game_id",
+          "level_id"
+        ],
+        "idx_level_date_game_level_pass_attempts": [
+          "date_id",
+          "game_id",
+          "level_id",
+          "passed",
+          "attempts"
+        ],
+        "idx_level_game_level_date_pass_attempts": [
+          "game_id",
+          "level_id",
+          "date_id",
+          "passed",
+          "attempts"
+        ],
+        "idx_level_player_date": [
+          "player_id",
+          "date_id"
+        ],
+        "PRIMARY": [
+          "event_id"
+        ]
+      },
+      "fact_payment": {
+        "idx_payment_date_game_amount": [
+          "date_id",
+          "game_id",
+          "amount"
+        ],
+        "idx_payment_date_game_player": [
+          "date_id",
+          "game_id",
+          "player_id"
+        ],
+        "idx_payment_player_date": [
+          "player_id",
+          "date_id"
+        ],
+        "PRIMARY": [
+          "payment_id"
+        ]
+      },
+      "fact_player_daily": {
+        "idx_daily_date_game_player": [
+          "date_id",
+          "game_id",
+          "player_id"
+        ],
+        "idx_daily_player_date": [
+          "player_id",
+          "date_id"
+        ],
+        "PRIMARY": [
+          "event_id"
+        ]
+      }
+    },
+    "table_statistics": {
+      "dim_date": {
+        "estimated_rows": 365,
+        "data_bytes": 16384,
+        "index_bytes": 0
+      },
+      "dim_game": {
+        "estimated_rows": 20,
+        "data_bytes": 16384,
+        "index_bytes": 0
+      },
+      "dim_player": {
+        "estimated_rows": 249343,
+        "data_bytes": 14172160,
+        "index_bytes": 7880704
+      },
+      "fact_level_event": {
+        "estimated_rows": 1991471,
+        "data_bytes": 144392192,
+        "index_bytes": 339525632
+      },
+      "fact_payment": {
+        "estimated_rows": 1992487,
+        "data_bytes": 126566400,
+        "index_bytes": 232800256
+      },
+      "fact_player_daily": {
+        "estimated_rows": 5826135,
+        "data_bytes": 393216000,
+        "index_bytes": 445497344
+      }
+    }
+  },
+  "after": {
+    "indexes": {
+      "dim_date": {
+        "PRIMARY": [
+          "date_id"
+        ]
+      },
+      "dim_game": {
+        "PRIMARY": [
+          "game_id"
+        ]
+      },
+      "dim_player": {
+        "idx_player_channel_player": [
+          "acquisition_channel",
+          "player_id"
+        ],
+        "PRIMARY": [
+          "player_id"
+        ]
+      },
+      "fact_level_event": {
+        "idx_level_date_game_level": [
+          "date_id",
+          "game_id",
+          "level_id"
+        ],
+        "idx_level_date_game_level_pass_attempts": [
+          "date_id",
+          "game_id",
+          "level_id",
+          "passed",
+          "attempts"
+        ],
+        "idx_level_game_level_date_pass_attempts": [
+          "game_id",
+          "level_id",
+          "date_id",
+          "passed",
+          "attempts"
+        ],
+        "idx_level_player_date": [
+          "player_id",
+          "date_id"
+        ],
+        "PRIMARY": [
+          "event_id"
+        ]
+      },
+      "fact_payment": {
+        "idx_payment_date_game_amount": [
+          "date_id",
+          "game_id",
+          "amount"
+        ],
+        "idx_payment_date_game_player": [
+          "date_id",
+          "game_id",
+          "player_id"
+        ],
+        "idx_payment_player_date": [
+          "player_id",
+          "date_id"
+        ],
+        "PRIMARY": [
+          "payment_id"
+        ]
+      },
+      "fact_player_daily": {
+        "idx_daily_date_game_player": [
+          "date_id",
+          "game_id",
+          "player_id"
+        ],
+        "idx_daily_player_date": [
+          "player_id",
+          "date_id"
+        ],
+        "PRIMARY": [
+          "event_id"
+        ]
+      }
+    },
+    "table_statistics": {
+      "dim_date": {
+        "estimated_rows": 365,
+        "data_bytes": 16384,
+        "index_bytes": 0
+      },
+      "dim_game": {
+        "estimated_rows": 20,
+        "data_bytes": 16384,
+        "index_bytes": 0
+      },
+      "dim_player": {
+        "estimated_rows": 249343,
+        "data_bytes": 14172160,
+        "index_bytes": 7880704
+      },
+      "fact_level_event": {
+        "estimated_rows": 1991471,
+        "data_bytes": 144392192,
+        "index_bytes": 339525632
+      },
+      "fact_payment": {
+        "estimated_rows": 1992487,
+        "data_bytes": 126566400,
+        "index_bytes": 232800256
+      },
+      "fact_player_daily": {
+        "estimated_rows": 5826135,
+        "data_bytes": 393216000,
+        "index_bytes": 445497344
+      }
+    }
+  },
+  "metrics": {
+    "analyze_elapsed_seconds": 0.188979,
+    "analyze_results": [
+      [
+        "gamequery_scale_10m.dim_player",
+        "analyze",
+        "status",
+        "OK"
+      ],
+      [
+        "gamequery_scale_10m.dim_game",
+        "analyze",
+        "status",
+        "OK"
+      ],
+      [
+        "gamequery_scale_10m.dim_date",
+        "analyze",
+        "status",
+        "OK"
+      ],
+      [
+        "gamequery_scale_10m.fact_player_daily",
+        "analyze",
+        "status",
+        "OK"
+      ],
+      [
+        "gamequery_scale_10m.fact_payment",
+        "analyze",
+        "status",
+        "OK"
+      ],
+      [
+        "gamequery_scale_10m.fact_level_event",
+        "analyze",
+        "status",
+        "OK"
+      ]
+    ],
+    "total_elapsed_seconds": 0.417022
+  },
+  "failure": null
+}
