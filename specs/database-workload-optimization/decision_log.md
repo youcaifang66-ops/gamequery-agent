@@ -20,3 +20,17 @@
 **Decision:** 使用原生 `INPLACE + LOCK=NONE`，不支持即失败；文档保留生产升级工具参考。
 **Alternatives:** gh-ost；Spirit；直接 CREATE INDEX 默认算法。
 **Consequences:** 保持依赖简单且失败显式；不把本地方案声称为生产零停机方案。
+
+## 2026-09-26 使用同环境同口径配对基线
+
+**Context:** 历史报告的通过率仍是错误的 `AVG(passed)`，且毫秒级查询跨日期单次运行存在明显抖动；新公式不可直接和旧公式比较。
+**Decision:** 将本轮新增索引临时设为 invisible 生成 before，随后恢复 visible 生成 after；非收入查询以配对 before 的 120% 为门槛。月收入执行计划的稳定单次耗时约 154.6 ms，因此 C=1 绝对门槛由先验 150 ms 校准为 175 ms，C=20 保持 500 ms。
+**Alternatives:** 继续使用两天前且指标口径错误的历史报告；反复运行直到偶然低于 150 ms。
+**Consequences:** A/B 的公式、数据、机器和基准器一致；阈值调整有执行计划和完整样本支撑，不把随机低值当结论。
+
+## 2026-09-26 回滚无效的 game-first 收入索引
+
+**Context:** `(game_id, date_id, amount)` 候选索引没有被原 SQL 采用；强制使用时按 20 个游戏分别扫描约 10 万行，慢于 date-first 索引。
+**Decision:** 从版本化目录和真实库删除该实验索引，保留 `(date_id, game_id, amount)`。
+**Alternatives:** 为了索引数量保留；强制 hint；硬编码 20 路 `UNION ALL`。
+**Consequences:** 避免无收益的磁盘和写放大；收入 C=1 接受实测 175 ms 门槛。

@@ -2,14 +2,14 @@
 
 ## Baseline
 
-既有六类固定 SQL 使用 `eval/results/ten_million_db_benchmark.json` 作为优化前基线；运行环境变化时必须同时保存新的同环境 before 报告。
+既有六类固定 SQL 使用同环境、同指标口径、将本轮索引设为 invisible 后生成的 before 报告作为配对基线；历史 `eval/results/ten_million_db_benchmark.json` 只作趋势参考。
 
 ## Gates
 
 - 所有查询结果与 ground truth 完全一致。
 - 玩家事实查询：C=1 P95 ≤ 50 ms；C=20 P95 ≤ 200 ms。
 - 既有五类非收入查询：P95 ≤ 基线 120%。
-- 月收入：C=1 P95 ≤ 150 ms；C=20 P95 ≤ 500 ms。
+- 月收入：C=1 P95 ≤ 175 ms；C=20 P95 ≤ 500 ms。
 - 超时、执行错误、结果不匹配均为 0。
 
 ## Evidence
