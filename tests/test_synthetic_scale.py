@@ -1,9 +1,12 @@
+import csv
 import json
+from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 
 import pytest
 
 from eval.generate_scale_data import DEFAULT_SEED, PRESET_ROWS, generate
+from eval.synthetic_profile import CAMPAIGN_DATE_ID, TARGET_GAME_ID, TARGET_LEVEL_ID
 
 FACT_FILES = {
     "fact_player_daily.csv",
@@ -89,6 +92,36 @@ def test_ground_truth_has_six_executable_answer_categories(tmp_path):
         assert case["params"]
         assert case["columns"]
         assert isinstance(case["expected_rows"], list)
+
+
+def test_pass_rate_ground_truth_uses_attempt_weighted_metric(tmp_path):
+    output = tmp_path / "dataset"
+    generate(output, rows=5_000, seed=DEFAULT_SEED)
+    ledger = json.loads((output / "ground_truth.json").read_text(encoding="utf-8"))
+    case = next(item for item in ledger["cases"] if item["category"] == "pass_rate")
+
+    assert "SUM(passed)" in case["sql"]
+    assert "SUM(attempts)" in case["sql"]
+    assert "AVG(passed)" not in case["sql"]
+
+    passed = 0
+    attempts = 0
+    with (output / "fact_level_event.csv").open(
+        encoding="utf-8", newline=""
+    ) as handle:
+        for row in csv.DictReader(handle):
+            if (
+                row["game_id"] == TARGET_GAME_ID
+                and row["level_id"] == TARGET_LEVEL_ID
+                and int(row["date_id"]) == CAMPAIGN_DATE_ID
+            ):
+                passed += int(row["passed"])
+                attempts += int(row["attempts"])
+
+    expected = (Decimal(passed) / attempts).quantize(
+        Decimal("0.0001"), rounding=ROUND_HALF_UP
+    )
+    assert case["expected_rows"][0][2] == format(expected, ".4f")
 
 
 def test_generation_report_records_measured_resource_scope(tmp_path):

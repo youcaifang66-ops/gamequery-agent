@@ -74,3 +74,26 @@ def test_full_scan_detects_foreign_key_and_ground_truth_mismatch(tmp_path):
     _refresh_manifest_file(wrong_answer, "ground_truth.json")
     with pytest.raises(DatasetValidationError, match="GROUND_TRUTH_MISMATCH"):
         validate_dataset(wrong_answer, full_scan=True)
+
+
+def test_validator_recomputes_pass_rate_from_attempts(tmp_path):
+    dataset = tmp_path / "attempt-weighted-pass-rate"
+    generate(dataset, rows=5_000)
+    fact_path = dataset / "fact_level_event.csv"
+    rows = list(csv.DictReader(fact_path.open(encoding="utf-8", newline="")))
+    target = next(
+        row
+        for row in rows
+        if row["game_id"] == "G001"
+        and row["level_id"] == "LEVEL_005"
+        and row["date_id"] == "20260918"
+    )
+    target["attempts"] = str(int(target["attempts"]) + 100)
+    with fact_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=rows[0].keys(), lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(rows)
+    _refresh_manifest_file(dataset, "fact_level_event.csv")
+
+    with pytest.raises(DatasetValidationError, match="GROUND_TRUTH_MISMATCH"):
+        validate_dataset(dataset, full_scan=True)
