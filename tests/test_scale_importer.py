@@ -5,11 +5,13 @@ import pytest
 from eval.generate_scale_data import generate
 from eval.import_scale_data import (
     ANALYZE_TABLES,
+    INDEX_STATEMENTS,
     ScaleImportError,
     import_dataset,
     iter_csv_batches,
     validate_database_target,
 )
+from eval.schema_optimization import index_statements
 
 
 @pytest.mark.parametrize(
@@ -50,6 +52,12 @@ def test_importer_refreshes_optimizer_statistics_for_every_table():
         "fact_payment",
         "fact_level_event",
     }
+
+
+def test_importer_uses_the_versioned_index_catalog():
+    assert INDEX_STATEMENTS == index_statements()
+    assert all("ALGORITHM=INPLACE" in sql for sql in INDEX_STATEMENTS)
+    assert all("LOCK=NONE" in sql for sql in INDEX_STATEMENTS)
 
 
 def test_invalid_dataset_fails_before_database_connection(tmp_path):
