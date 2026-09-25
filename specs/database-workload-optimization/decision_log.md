@@ -34,3 +34,10 @@
 **Decision:** 从版本化目录和真实库删除该实验索引，保留 `(date_id, game_id, amount)`。
 **Alternatives:** 为了索引数量保留；强制 hint；硬编码 20 路 `UNION ALL`。
 **Consequences:** 避免无收益的磁盘和写放大；收入 C=1 接受实测 175 ms 门槛。
+
+## 2026-09-26 删除被替代的 date-first 通过率覆盖索引
+
+**Context:** game/level-first 覆盖索引将通过率估算扫描行从约 315,160 降到 675，执行计划不再选择本轮新增的 date-first 覆盖索引。
+**Decision:** 回滚本轮新增的 `idx_level_date_game_level_pass_attempts`，保留原有非覆盖索引和选择性更高的新覆盖索引。
+**Alternatives:** 同时保留两个覆盖索引。
+**Consequences:** 节省约 89.7 MiB 索引空间并减少写放大；删除后重跑玩家与运营基准，所有门槛仍通过。
