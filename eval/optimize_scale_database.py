@@ -238,8 +238,8 @@ async def _main() -> None:
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     username = os.environ.get("SCALE_DB_USER", "")
-    password = os.environ.get("SCALE_DB_PASSWORD", "")
-    if not username or not password:
+    password = os.environ.get("SCALE_DB_PASSWORD")
+    if not username or password is None:
         _fail(
             "DATABASE_UNAVAILABLE", "SCALE_DB_USER and SCALE_DB_PASSWORD are required"
         )

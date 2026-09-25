@@ -247,8 +247,8 @@ async def _main() -> None:
     parser.add_argument("--timeout-seconds", type=float, default=10.0)
     args = parser.parse_args()
     username = os.environ.get("SCALE_DB_USER", "")
-    password = os.environ.get("SCALE_DB_PASSWORD", "")
-    if not username or not password:
+    password = os.environ.get("SCALE_DB_PASSWORD")
+    if not username or password is None:
         raise ScaleBenchmarkError(
             "DATABASE_UNAVAILABLE: SCALE_DB_USER and SCALE_DB_PASSWORD are required"
         )
