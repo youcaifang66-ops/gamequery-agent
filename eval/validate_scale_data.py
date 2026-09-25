@@ -87,7 +87,7 @@ def _scan_dataset(
     revenue: defaultdict[str, Decimal] = defaultdict(Decimal)
     payers: set[str] = set()
     target_revenue = Decimal(0)
-    level_total = 0
+    level_attempts = 0
     level_passed = 0
 
     fact_specs = (
@@ -132,7 +132,7 @@ def _scan_dataset(
                 and row["level_id"] == TARGET_LEVEL_ID
                 and 20260901 <= date_id <= 20260930
             ):
-                level_total += 1
+                level_attempts += int(row["attempts"])
                 level_passed += int(row["passed"])
         counts[filename] = count
 
@@ -153,7 +153,7 @@ def _scan_dataset(
             [
                 TARGET_GAME_ID,
                 TARGET_LEVEL_ID,
-                _ratio(Decimal(level_passed), level_total),
+                _ratio(Decimal(level_passed), level_attempts),
             ]
         ],
         "channel_split_campaign_game": [

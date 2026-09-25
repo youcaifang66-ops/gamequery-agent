@@ -181,7 +181,7 @@ def _ground_truth(
     payers: set[str],
     revenue_cents: int,
     level_passed: int,
-    level_total: int,
+    level_attempts: int,
 ) -> dict:
     target_params = {"game_id": TARGET_GAME_ID, "date_id": CAMPAIGN_DATE_ID}
     return {
@@ -240,7 +240,7 @@ def _ground_truth(
                 "id": "pass_rate_target_level",
                 "category": "pass_rate",
                 "question": "2026年9月 G001 的 LEVEL_005 通过率是多少？",
-                "sql": "SELECT game_id, level_id, CAST(ROUND(AVG(passed),4) AS CHAR) AS pass_rate FROM fact_level_event WHERE game_id=%(game_id)s AND level_id=%(level_id)s AND date_id BETWEEN %(start_date)s AND %(end_date)s GROUP BY game_id, level_id",
+                "sql": "SELECT game_id, level_id, CAST(ROUND(SUM(passed) / NULLIF(SUM(attempts), 0),4) AS CHAR) AS pass_rate FROM fact_level_event WHERE game_id=%(game_id)s AND level_id=%(level_id)s AND date_id BETWEEN %(start_date)s AND %(end_date)s GROUP BY game_id, level_id",
                 "params": {
                     "game_id": TARGET_GAME_ID,
                     "level_id": TARGET_LEVEL_ID,
@@ -252,7 +252,7 @@ def _ground_truth(
                     [
                         TARGET_GAME_ID,
                         TARGET_LEVEL_ID,
-                        _ratio(Decimal(level_passed), level_total),
+                        _ratio(Decimal(level_passed), level_attempts),
                     ]
                 ],
             },
@@ -329,7 +329,7 @@ def generate(output_dir: Path, *, rows: int, seed: int = DEFAULT_SEED) -> dict:
     target_revenue_cents = 0
     payment_histogram: Counter[int] = Counter()
     payment_total_cents = 0
-    target_level_total = 0
+    target_level_attempts = 0
     target_level_passed = 0
     total_level_passed = 0
 
@@ -419,7 +419,7 @@ def generate(output_dir: Path, *, rows: int, seed: int = DEFAULT_SEED) -> dict:
     )
 
     def level_records():
-        nonlocal peak_rss, target_level_total, target_level_passed, total_level_passed
+        nonlocal peak_rss, target_level_attempts, target_level_passed, total_level_passed
         for index in range(1, level_count + 1):
             if index <= 2:
                 player_id, game_id, date_id = (
@@ -436,12 +436,14 @@ def generate(output_dir: Path, *, rows: int, seed: int = DEFAULT_SEED) -> dict:
                 passed = int(randomizer.random() < 0.68)
             game_counts[game_id] += 1
             total_level_passed += passed
+            attempts = randomizer.randint(1, 8)
+            duration_seconds = randomizer.randint(10, 1800)
             if (
                 game_id == TARGET_GAME_ID
                 and 20260901 <= date_id <= 20260930
                 and level_id == TARGET_LEVEL_ID
             ):
-                target_level_total += 1
+                target_level_attempts += attempts
                 target_level_passed += passed
             if index % 50_000 == 0:
                 peak_rss = max(peak_rss, process.memory_info().rss)
@@ -451,9 +453,9 @@ def generate(output_dir: Path, *, rows: int, seed: int = DEFAULT_SEED) -> dict:
                 game_id,
                 date_id,
                 level_id,
-                randomizer.randint(1, 8),
+                attempts,
                 passed,
-                randomizer.randint(10, 1800),
+                duration_seconds,
             )
 
     files["fact_level_event.csv"] = _write_csv(
@@ -478,7 +480,7 @@ def generate(output_dir: Path, *, rows: int, seed: int = DEFAULT_SEED) -> dict:
         payers,
         target_revenue_cents,
         target_level_passed,
-        target_level_total,
+        target_level_attempts,
     )
     files["ground_truth.json"] = _write_json(
         output_dir / "ground_truth.json", ledger, rows=6
