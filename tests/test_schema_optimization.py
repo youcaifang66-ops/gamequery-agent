@@ -40,5 +40,5 @@ def test_catalog_statements_are_online_and_have_exact_rollbacks():
     for item, statement in zip(catalog, statements, strict=True):
         assert statement == item.create_sql
         assert f"CREATE INDEX `{item.name}` ON `{item.table}`" in statement
-        assert statement.endswith("ALGORITHM=INPLACE, LOCK=NONE")
+        assert statement.endswith("ALGORITHM=INPLACE LOCK=NONE")
         assert item.rollback_sql == f"DROP INDEX `{item.name}` ON `{item.table}`"

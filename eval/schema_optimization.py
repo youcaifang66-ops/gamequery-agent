@@ -16,7 +16,7 @@ class IndexSpec:
         columns = ", ".join(f"`{column}`" for column in self.columns)
         return (
             f"CREATE INDEX `{self.name}` ON `{self.table}` ({columns}) "
-            "ALGORITHM=INPLACE, LOCK=NONE"
+            "ALGORITHM=INPLACE LOCK=NONE"
         )
 
     @property
