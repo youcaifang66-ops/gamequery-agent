@@ -9,10 +9,10 @@ from eval.schema_optimization import index_catalog
 
 
 def _existing_catalog():
-    return {
-        item.table: {item.name: item.columns}
-        for item in index_catalog()
-    }
+    existing = {}
+    for item in index_catalog():
+        existing.setdefault(item.table, {})[item.name] = item.columns
+    return existing
 
 
 def test_empty_schema_plan_creates_every_catalog_index_without_mutating_input():
