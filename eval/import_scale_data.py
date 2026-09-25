@@ -18,8 +18,10 @@ from typing import Callable, Iterator, NoReturn
 import asyncmy
 
 try:
+    from eval.schema_optimization import index_statements
     from eval.validate_scale_data import DatasetValidationError, validate_dataset
 except ModuleNotFoundError:  # Direct script execution.
+    from schema_optimization import index_statements  # type: ignore[no-redef]
     from validate_scale_data import (  # type: ignore[no-redef]
         DatasetValidationError,
         validate_dataset,
@@ -45,12 +47,7 @@ TABLES = {
     "fact_level_event": ("fact_level_event.csv", 8),
 }
 ANALYZE_TABLES = tuple(TABLES)
-INDEX_STATEMENTS = (
-    "CREATE INDEX idx_daily_date_game_player ON fact_player_daily(date_id, game_id, player_id)",
-    "CREATE INDEX idx_payment_date_game_player ON fact_payment(date_id, game_id, player_id)",
-    "CREATE INDEX idx_level_date_game_level ON fact_level_event(date_id, game_id, level_id)",
-    "CREATE INDEX idx_player_channel_player ON dim_player(acquisition_channel, player_id)",
-)
+INDEX_STATEMENTS = index_statements()
 
 
 class ScaleImportError(ValueError):
