@@ -32,7 +32,7 @@ def _query_metrics(p95_ms):
 
 def _report():
     cases = build_player_audit_cases("P0000001", "P_NOT_FOUND")
-    return {
+    report = {
         "schema_version": "1.0",
         "status": "measured",
         "dataset": {"fact_rows": 10_000_000},
@@ -56,6 +56,11 @@ def _report():
         },
         "failure": None,
     }
+    for run in report["metrics"]["concurrency_runs"]:
+        for query_id, metrics in run["queries"].items():
+            if query_id.startswith("missing_player_"):
+                metrics["result_row_count"] = 0
+    return report
 
 
 def test_player_audit_cases_are_isolated_by_domain_and_cover_missing_player():
