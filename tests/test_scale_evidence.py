@@ -79,7 +79,7 @@ def test_schema_optimization_evidence_is_final_idempotent_and_costed():
     assert [item["index"] for item in selective["executed"]] == [
         "idx_level_game_level_date_pass_attempts"
     ]
-    assert final["migration_version"] == "2026-09-26.4"
+    assert final["migration_version"] == "2026-09-26.5"
     assert final["executed"] == []
     assert all(step["status"] == "already_present" for step in final["plan"])
     assert all(
